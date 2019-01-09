@@ -1,16 +1,17 @@
 package org.prettyjdbc.core;
 
+import org.prettyjdbc.core.session.InternalSession;
 import org.prettyjdbc.core.session.Session;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
- * The main function of the session factory is creating new {@link Session} instances between database and application.
- * Usually an application has a single {@link SessionFactory} instance
+ * The main function of the session factory is creating new {@link Session} instances between database and Java application.
+ * Usually an application has a single <code>SessionFactory</code> instance
  * but to support different {@link DataSource} it is necessary to create several factories.
- * The internal state of the {@link SessionFactory} is immutable so it is thread safe!
+ * The internal state of the <code>SessionFactory</code> is immutable so it is thread safe!
  * <p/>
  * To create a session factory, use the method {@link SessionFactory#create(DataSourceSupplier)}
  * which accepts a {@link DataSourceSupplier}.
@@ -31,7 +32,7 @@ public final class SessionFactory implements Unwrapable<DataSource> {
     }
 
     /**
-     * Unwrapping {@link DataSource} from the current {@link SessionFactory} for use outside.
+     * Unwrapping {@link DataSource} from the current <code>SessionFactory</code> for use outside.
      *
      * @return wrapped data source
      */
@@ -49,11 +50,20 @@ public final class SessionFactory implements Unwrapable<DataSource> {
      * @return successfully created session
      */
     public Session openSession() {
-        throw new NotImplementedException();
+        return newSession(getNewConnection());
+    }
+
+    private Connection getNewConnection() {
+        try {
+            return dataSource.getConnection();
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
-     * This method is the entry point for creating a {@link SessionFactory} based on {@link DataSource}.
+     * This method is the entry point for creating a <code>SessionFactory</code> based on {@link DataSource}.
      *
      * @param supplier data source provider
      * @return a new session factory
@@ -63,13 +73,13 @@ public final class SessionFactory implements Unwrapable<DataSource> {
     }
 
     /**
-     * Creates a new {@link Session} without the need for a {@link SessionFactory} instance.
+     * Creates a new {@link Session} without the need for a <code>SessionFactory</code> instance.
      * The session will be obtained as is and management must occur from outside.
      *
      * @param connection connection to wrap in session
      * @return successfully created session
      */
     public static Session newSession(Connection connection) {
-        throw new NotImplementedException();
+        return new InternalSession(connection);
     }
 }
