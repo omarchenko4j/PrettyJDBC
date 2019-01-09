@@ -1,10 +1,14 @@
 package org.prettyjdbc.core.session;
 
 import org.prettyjdbc.core.query.Query;
+import org.prettyjdbc.core.transaction.InternalTransaction;
+import org.prettyjdbc.core.transaction.Transaction;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * This is the main internal implementation of the {@link Session} interface.
@@ -17,6 +21,7 @@ import java.sql.SQLException;
 public class InternalSession implements Session {
 
     private final Connection connection;
+    private Transaction transaction;
 
     public InternalSession(Connection connection) {
         this.connection = connection;
@@ -38,6 +43,56 @@ public class InternalSession implements Session {
     @Override
     public Query createQuery(String sqlQuery) {
         throw new NotImplementedException();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Transaction beginTransaction() {
+        transaction = new InternalTransaction(connection);
+        transaction.begin();
+        return transaction;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Transaction getTransaction() {
+        return transaction;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void doInTransaction(Consumer<Session> consumer) {
+        Transaction transaction = beginTransaction();
+        try {
+            consumer.accept(this);
+            transaction.commit();
+        }
+        catch (Exception e) {
+            transaction.rollback();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <R> R doInTransaction(Function<Session, R> function) {
+        Transaction transaction = beginTransaction();
+        try {
+            R result = function.apply(this);
+            transaction.commit();
+            return result;
+        }
+        catch (Exception e) {
+            transaction.rollback();
+            throw new RuntimeException(e);
+        }
     }
 
     /**
