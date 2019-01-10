@@ -3,9 +3,10 @@ package org.prettyjdbc.core.session;
 import org.prettyjdbc.core.query.Query;
 import org.prettyjdbc.core.transaction.InternalTransaction;
 import org.prettyjdbc.core.transaction.Transaction;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import org.prettyjdbc.core.transaction.TransactionStatus;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -16,6 +17,8 @@ import java.util.function.Function;
  * @author Oleg Marchenko
  *
  * @see org.prettyjdbc.core.session.Session
+ * @see org.prettyjdbc.core.transaction.Transaction
+ * @see org.prettyjdbc.core.query.Query
  */
 
 public class InternalSession implements Session {
@@ -42,7 +45,16 @@ public class InternalSession implements Session {
      */
     @Override
     public Query createQuery(String sqlQuery) {
-        throw new NotImplementedException();
+        return new Query(getNewPreparedStatement(sqlQuery));
+    }
+
+    private PreparedStatement getNewPreparedStatement(String sqlQuery) {
+        try {
+            return connection.prepareStatement(sqlQuery);
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -128,7 +140,14 @@ public class InternalSession implements Session {
 
     private void closeInternal() throws SQLException {
         if (!connection.isClosed()) {
+            if (hasActiveTransaction()) {
+                transaction.rollback();
+            }
             connection.close();
         }
+    }
+
+    private boolean hasActiveTransaction() {
+        return transaction != null && transaction.getStatus() == TransactionStatus.ACTIVE;
     }
 }

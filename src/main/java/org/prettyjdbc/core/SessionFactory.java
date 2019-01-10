@@ -8,11 +8,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * The main function of the session factory is creating new {@link Session} instances between database and Java application.
+ * The main function of the session factory is creating new {@link Session} instances between relational database and Java application.
  * Usually an application has a single <code>SessionFactory</code> instance
  * but to support different {@link DataSource} it is necessary to create several factories.
  * The internal state of the <code>SessionFactory</code> is immutable so it is thread safe!
- * <p/>
+ * <br>
  * To create a session factory, use the method {@link SessionFactory#create(DataSourceSupplier)}
  * which accepts a {@link DataSourceSupplier}.
  * If there is no {@link DataSource}, use the method {@link SessionFactory#newSession(Connection)}

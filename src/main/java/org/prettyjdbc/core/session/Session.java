@@ -12,14 +12,15 @@ import java.util.function.Function;
  * The main runtime interface which describes the contract between a Java application and database.
  * The <code>Session</code> is a wrapper over the JDBC {@link Connection} and is used to simplify working with it.
  * The main function of the session is to create queries in a relational database.
- * <p/>
+ * <br>
  * To create a query, use the method {@link Session#createQuery(String)} that accepts a SQL query.
  * The lifecycle of a <code>Session</code> is limited to its creation using the {@link org.prettyjdbc.core.SessionFactory}
  * and the destruction using the method {@link Session#close()}.
  *
  * @author Oleg Marchenko
  *
- * @see org.prettyjdbc.core.SessionFactory
+ * @see org.prettyjdbc.core.transaction.Transaction
+ * @see org.prettyjdbc.core.query.Query
  */
 
 public interface Session extends Unwrapable<Connection>, AutoCloseable {

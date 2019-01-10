@@ -26,7 +26,9 @@ public class InternalTransaction implements Transaction {
      */
     @Override
     public final void begin() {
-        doBegin();
+        if (status == TransactionStatus.NOT_ACTIVE) {
+            doBegin();
+        }
     }
 
     private void doBegin() {
@@ -39,8 +41,10 @@ public class InternalTransaction implements Transaction {
      */
     @Override
     public final void commit() {
-        doCommit();
-        doComplete();
+        if (status == TransactionStatus.ACTIVE) {
+            doCommit();
+            doComplete();
+        }
     }
 
     private void doCommit() {
@@ -57,8 +61,10 @@ public class InternalTransaction implements Transaction {
      */
     @Override
     public final void rollback() {
-        doRollback();
-        doComplete();
+        if (status == TransactionStatus.ACTIVE) {
+            doRollback();
+            doComplete();
+        }
     }
 
     private void doRollback() {

@@ -8,9 +8,17 @@ import java.util.function.Supplier;
  *
  * @author Oleg Marchenko
  *
- * @see javax.sql.DataSource
+ * @see org.prettyjdbc.core.SessionFactory#create(DataSourceSupplier)
  */
 
 @FunctionalInterface
 public interface DataSourceSupplier extends Supplier<DataSource> {
+
+    /**
+     * Provides a non-null configured data source.
+     *
+     * @return a configured data source
+     */
+    @Override
+    DataSource get();
 }

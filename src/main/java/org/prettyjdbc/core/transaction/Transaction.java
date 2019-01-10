@@ -4,7 +4,7 @@ package org.prettyjdbc.core.transaction;
  * This abstraction defines a unit of work with a relational database. The lifecycle of a <code>Transaction</code> begins
  * with a method {@link Transaction#begin()} and ends with methods {@link Transaction#commit()} if successful
  * or {@link Transaction#rollback()} otherwise.
- * <p/>
+ * <br>
  * A transaction is associated with a {@link org.prettyjdbc.core.session.Session} and is usually initiated by a call to
  * {@link org.prettyjdbc.core.session.Session#beginTransaction()}. A single session might span multiple transactions
  * since the notion of a session (a conversation between the Java application and the database) is of coarser
@@ -20,6 +20,7 @@ public interface Transaction {
 
     /**
      * Begins a new resource transaction within the current session.
+     * This method is idempotent and when called repeatedly, it begins a transaction only once.
      *
      * @throws RuntimeException if a database access error occurs
      *  or this method is called when the session connection is closed
@@ -28,7 +29,7 @@ public interface Transaction {
 
     /**
      * Fixation of all changes within the current active transaction.
-     * This method should be used only after the method {@link Transaction#begin()}.
+     * This method should be used only after calling the method {@link Transaction#begin()}.
      *
      * @throws RuntimeException if a database access error occurs
      *  or this method is called when the session connection is closed
@@ -37,15 +38,15 @@ public interface Transaction {
 
     /**
      * Cancels all changes made to the current transaction.
-     * This method should be used only after the method {@link Transaction#begin()}.
+     * This method should be used only after calling the method {@link Transaction#begin()}.
      *
-     *@throws RuntimeException if a database access error occurs
+     * @throws RuntimeException if a database access error occurs
      *  or this method is called when the session connection is closed
      */
     void rollback();
 
     /**
-     * Returns the current local status of this transaction. This only accounts for the local view of the transaction status.
+     * Returns the current local status of this transaction. This only accounts for the local view of the transaction status.<br>
      * In other words it does not check the status of the actual underlying transaction.
      *
      * @return the current local status of this transaction
