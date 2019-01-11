@@ -26,7 +26,7 @@ import java.time.LocalTime;
  * @see org.prettyjdbc.core.query.scrollable_result.ReadOnlyScrollableResult
  */
 
-public class Query implements Unwrapable<PreparedStatement> {
+public class Query implements Unwrapable<PreparedStatement>, IndexedParameterQuerySetter<Query> {
 
     private final PreparedStatement preparedStatement;
 
@@ -133,6 +133,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, boolean value) {
         try {
             preparedStatement.setBoolean(paramIndex, value);
@@ -150,6 +151,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, byte value) {
         try {
             preparedStatement.setByte(paramIndex, value);
@@ -167,6 +169,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, short value) {
         try {
             preparedStatement.setShort(paramIndex, value);
@@ -184,6 +187,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, int value) {
         try {
             preparedStatement.setInt(paramIndex, value);
@@ -201,6 +205,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, long value) {
         try {
             preparedStatement.setLong(paramIndex, value);
@@ -218,6 +223,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, float value) {
         try {
             preparedStatement.setFloat(paramIndex, value);
@@ -235,6 +241,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, double value) {
         try {
             preparedStatement.setDouble(paramIndex, value);
@@ -252,6 +259,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, BigDecimal value) {
         try {
             preparedStatement.setBigDecimal(paramIndex, value);
@@ -269,6 +277,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, String value) {
         try {
             preparedStatement.setString(paramIndex, value);
@@ -286,6 +295,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, byte[] value) {
         try {
             preparedStatement.setBytes(paramIndex, value);
@@ -303,6 +313,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, Date value) {
         try {
             preparedStatement.setDate(paramIndex, value);
@@ -320,6 +331,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, LocalDate value) {
         Date date = null;
         if (value != null) {
@@ -335,6 +347,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, Time value) {
         try {
             preparedStatement.setTime(paramIndex, value);
@@ -352,6 +365,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, LocalTime value) {
         Time time = null;
         if (value != null) {
@@ -367,6 +381,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, Timestamp value) {
         try {
             preparedStatement.setTimestamp(paramIndex, value);
@@ -384,6 +399,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, LocalDateTime value) {
         Timestamp timestamp = null;
         if (value != null) {
@@ -399,6 +415,7 @@ public class Query implements Unwrapable<PreparedStatement> {
      * @param value the parameter value
      * @return instance of this query
      */
+    @Override
     public Query setParameter(int paramIndex, Object value) {
         try {
             preparedStatement.setObject(paramIndex, value);
