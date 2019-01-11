@@ -3,10 +3,10 @@ package org.prettyjdbc.core.session;
 import org.prettyjdbc.core.Unwrapable;
 import org.prettyjdbc.core.query.Query;
 import org.prettyjdbc.core.transaction.Transaction;
+import org.prettyjdbc.core.transaction.TransactionWork;
+import org.prettyjdbc.core.transaction.TransactionWorkWithResult;
 
 import java.sql.Connection;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * The main runtime interface which describes the contract between a Java application and database.
@@ -55,20 +55,22 @@ public interface Session extends Unwrapable<Connection>, AutoCloseable {
     /**
      * This method allows to <tt>atomically</tt> perform database operations without returning the result.
      *
-     * @param consumer database operations provider
+     * @param work database operations provider
+     * @throws RuntimeException if a database access error occurs
+     *  or this method is called when the session connection is closed
      */
-    void doInTransaction(Consumer<Session> consumer);
+    void doInTransaction(TransactionWork work);
 
     /**
      * This method allows to <tt>atomically</tt> perform database operations with returning the result.
      *
      * @param <R> type of returning result
-     * @param function database operations provider with result
-     * @return unit of work result
+     * @param work database operations with result provider
+     * @return result of completed database operations
      * @throws RuntimeException if a database access error occurs
      *  or this method is called when the session connection is closed
      */
-    <R> R doInTransaction(Function<Session, R> function);
+    <R> R doInTransaction(TransactionWorkWithResult<R> work);
 
     /**
      * Returns <code>true</code> if the session connection is still open.

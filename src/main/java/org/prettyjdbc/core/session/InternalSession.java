@@ -1,15 +1,11 @@
 package org.prettyjdbc.core.session;
 
 import org.prettyjdbc.core.query.Query;
-import org.prettyjdbc.core.transaction.InternalTransaction;
-import org.prettyjdbc.core.transaction.Transaction;
-import org.prettyjdbc.core.transaction.TransactionStatus;
+import org.prettyjdbc.core.transaction.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * This is the main internal implementation of the {@link Session} interface.
@@ -79,10 +75,10 @@ public class InternalSession implements Session {
      * {@inheritDoc}
      */
     @Override
-    public void doInTransaction(Consumer<Session> consumer) {
+    public void doInTransaction(TransactionWork work) {
         Transaction transaction = beginTransaction();
         try {
-            consumer.accept(this);
+            work.execute(this);
             transaction.commit();
         }
         catch (Exception e) {
@@ -94,16 +90,16 @@ public class InternalSession implements Session {
      * {@inheritDoc}
      */
     @Override
-    public <R> R doInTransaction(Function<Session, R> function) {
+    public <R> R doInTransaction(TransactionWorkWithResult<R> work) {
         Transaction transaction = beginTransaction();
         try {
-            R result = function.apply(this);
+            R result = work.execute(this);
             transaction.commit();
             return result;
         }
         catch (Exception e) {
             transaction.rollback();
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
