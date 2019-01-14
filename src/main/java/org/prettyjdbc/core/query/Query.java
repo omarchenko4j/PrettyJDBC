@@ -26,7 +26,7 @@ import java.time.LocalTime;
  * @see org.prettyjdbc.core.query.scrollable_result.ReadOnlyScrollableResult
  */
 
-public class Query implements Unwrapable<PreparedStatement>, IndexedParameterQuerySetter<Query> {
+public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, IndexedParameterQuerySetter<Query> {
 
     private final PreparedStatement preparedStatement;
 
@@ -124,6 +124,17 @@ public class Query implements Unwrapable<PreparedStatement>, IndexedParameterQue
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Releases the internal {@link PreparedStatement} object and JDBC resources immediately,
+     * instead of waiting for the automatic closing to occur.
+     *
+     * @exception SQLException if a database access error occurs
+     */
+    @Override
+    public void close() throws SQLException {
+        preparedStatement.close();
     }
 
     /**
@@ -424,5 +435,24 @@ public class Query implements Unwrapable<PreparedStatement>, IndexedParameterQue
             throw new RuntimeException(e);
         }
         return this;
+    }
+
+    /**
+     * Allows to immediately close the query, protecting against possible exceptions.
+     *
+     * @param query the query to close
+     *
+     * @see Query#close()
+     */
+    public static void closeQuerySoftly(Query query) {
+        if (query != null && query.isActive()) {
+            try {
+                query.close();
+            }
+            catch (SQLException e) {
+                // Intentionally swallow the exception.
+                // TODO: Add the warning after adding logging library.
+            }
+        }
     }
 }

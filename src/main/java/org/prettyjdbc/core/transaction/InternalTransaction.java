@@ -97,4 +97,32 @@ public class InternalTransaction implements Transaction {
     public TransactionStatus getStatus() {
         return status;
     }
+
+    /**
+     * Allows to immediately stop an active transaction, protecting against possible exceptions.
+     *
+     * @param transaction transaction to stop
+     */
+    public static void stopTransactionSoftly(Transaction transaction) {
+        if (isActiveTransaction(transaction)) {
+            try {
+                transaction.rollback();
+            }
+            catch (Exception e) {
+                // Intentionally swallow the exception.
+                // TODO: Add the warning after adding logging library.
+            }
+        }
+    }
+
+    /**
+     * Returns <code>true</code> if the transaction is still active.
+     *
+     * @param transaction transaction for check status
+     * @return <code>true</code> if this <code>Transaction</code> object is still active;
+     *         <code>false</code> otherwise
+     */
+    public static boolean isActiveTransaction(Transaction transaction) {
+        return transaction != null && transaction.getStatus() == TransactionStatus.ACTIVE;
+    }
 }
