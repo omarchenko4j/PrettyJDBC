@@ -145,7 +145,7 @@ public class InternalSession implements Session {
     }
 
     /**
-     * End the session by releasing the JDBC connection and cleaning up.
+     * {@inheritDoc}
      */
     @Override
     public void close() {

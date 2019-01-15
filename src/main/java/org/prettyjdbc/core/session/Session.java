@@ -81,4 +81,10 @@ public interface Session extends Unwrapable<Connection>, AutoCloseable {
      *         <code>false</code> if it is closed
      */
     boolean isOpen();
+
+    /**
+     * End the session by releasing the JDBC connection and cleaning up.
+     */
+    @Override
+    void close();
 }
