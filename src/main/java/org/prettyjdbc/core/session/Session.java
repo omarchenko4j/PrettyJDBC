@@ -1,7 +1,7 @@
 package org.prettyjdbc.core.session;
 
 import org.prettyjdbc.core.Unwrapable;
-import org.prettyjdbc.core.query.Query;
+import org.prettyjdbc.core.query.SimpleQuery;
 import org.prettyjdbc.core.transaction.Transaction;
 import org.prettyjdbc.core.transaction.TransactionWork;
 import org.prettyjdbc.core.transaction.TransactionWorkWithResult;
@@ -20,19 +20,19 @@ import java.sql.Connection;
  * @author Oleg Marchenko
  *
  * @see org.prettyjdbc.core.transaction.Transaction
- * @see org.prettyjdbc.core.query.Query
+ * @see org.prettyjdbc.core.query.SimpleQuery
  */
 
 public interface Session extends Unwrapable<Connection>, AutoCloseable {
 
     /**
-     * Creates a {@link Query} object for sending SQL statements to the database.
+     * Creates a {@link SimpleQuery} object for sending SQL statements to the database.
      * This object can then be used to efficiently execute this statement multiple times.
      *
      * @param sqlQuery an SQL query that may contain one or more parameters as <tt>?</tt>
      * @return a new simple <code>Query</code> object
      */
-    Query createQuery(String sqlQuery);
+    SimpleQuery createQuery(String sqlQuery);
 
     /**
      * Begins a unit of work and return the associated {@link Transaction} object.

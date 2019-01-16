@@ -1,6 +1,7 @@
 package org.prettyjdbc.core.session;
 
-import org.prettyjdbc.core.query.Query;
+import org.prettyjdbc.core.query.AbstractQuery;
+import org.prettyjdbc.core.query.SimpleQuery;
 import org.prettyjdbc.core.transaction.InternalTransaction;
 import org.prettyjdbc.core.transaction.Transaction;
 import org.prettyjdbc.core.transaction.TransactionWork;
@@ -24,7 +25,7 @@ import static org.prettyjdbc.core.transaction.InternalTransaction.isActiveTransa
  *
  * @see org.prettyjdbc.core.session.Session
  * @see org.prettyjdbc.core.transaction.Transaction
- * @see org.prettyjdbc.core.query.Query
+ * @see org.prettyjdbc.core.query.SimpleQuery
  */
 
 public class InternalSession implements Session {
@@ -39,7 +40,7 @@ public class InternalSession implements Session {
     /**
      * A queue of associated queries with this session.
      */
-    private FixedSizeQueue<Query> queries;
+    private FixedSizeQueue<SimpleQuery> queries;
 
     public InternalSession(Connection connection) {
         this.connection = connection;
@@ -60,8 +61,8 @@ public class InternalSession implements Session {
      * {@inheritDoc}
      */
     @Override
-    public Query createQuery(String sqlQuery) {
-        Query query = new Query(getNewStatement(sqlQuery));
+    public SimpleQuery createQuery(String sqlQuery) {
+        SimpleQuery query = new SimpleQuery(getNewStatement(sqlQuery));
         bindQuery(query);
         return query;
     }
@@ -75,8 +76,8 @@ public class InternalSession implements Session {
         }
     }
 
-    private void bindQuery(Query query) {
-        queries.offer(query, Query::closeQuerySoftly);
+    private void bindQuery(SimpleQuery query) {
+        queries.offer(query, AbstractQuery::closeQuerySoftly);
     }
 
     /**
@@ -155,7 +156,7 @@ public class InternalSession implements Session {
     }
 
     private void releaseQueries() {
-        queries.forEach(Query::closeQuerySoftly);
+        queries.forEach(AbstractQuery::closeQuerySoftly);
         queries.clear();
         queries = null;
     }

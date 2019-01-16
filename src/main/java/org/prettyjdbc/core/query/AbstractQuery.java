@@ -11,31 +11,40 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 /**
- * The <code>Query</code> represents a single operation to the relational database.
+ * This abstraction is the base parent for all types of queries.
+ * The <code>AbstractQuery</code> implements the necessary methods to execute a single query into the database.
  * It extends the capabilities of the standard abstraction {@link java.sql.PreparedStatement}.
- * The lifecycle of a <code>Query</code> is very short and starts with the method {@link org.prettyjdbc.core.session.Session#createQuery(String)}.
- * Multiple SQL queries can be created within one {@link org.prettyjdbc.core.session.Session}.
+ * The lifecycle of any implementation is very short and starts with the method {@link org.prettyjdbc.core.session.Session#createQuery(String)}.
  * <br>
- * To perform a native SQL query, use the method {@link Query#execute()} which will return the result as {@link ReadOnlyScrollableResult};
- * to update the data, use the method {@link Query#executeUpdate()};
- * to perform a batched query, use the method {@link Query#addBatch()} to add a batch
- * and {@link Query#executeBatch()} to apply it.
+ * To perform a native SQL query, use the method {@link AbstractQuery#execute()} which will return the result as {@link ReadOnlyScrollableResult};
+ * to <code>INSERT</code>, <code>UPDATE</code> or <code>DELETE</code> the data, use the method {@link AbstractQuery#executeUpdate()};
+ * to perform a batched query, use the method {@link AbstractQuery#addBatch()} to add a batch and {@link AbstractQuery#executeBatch()} to apply it.
+ *
+ * @param <Q> the type of specific query implementation
  *
  * @author Oleg Marchenko
  *
  * @see org.prettyjdbc.core.query.scrollable_result.ReadOnlyScrollableResult
  */
 
-public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, IndexedParameterQuerySetter<Query> {
+public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>, AutoCloseable, IndexedParameterQuerySetter<Q> {
 
-    private final PreparedStatement preparedStatement;
+    protected final PreparedStatement preparedStatement;
 
-    public Query(PreparedStatement preparedStatement) {
+    protected AbstractQuery(PreparedStatement preparedStatement) {
         this.preparedStatement = preparedStatement;
     }
 
     /**
-     * Unwrapping {@link PreparedStatement} from the current <code>Query</code> for use outside.
+     * Returns the specific query instance.
+     * Used to return from parameter setting methods to be able to work with a call chain.
+     *
+     * @return the specific query instance
+     */
+    protected abstract Q getInstance();
+
+    /**
+     * Unwrapping {@link PreparedStatement} from the specific query implementation for use outside.
      *
      * @return wrapped <code>PreparedStatement</code>
      */
@@ -80,15 +89,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
     /**
      * Adds a set of parameters to this <code>Query</code> object's batch of commands.
      *
+     * @return instance of the specific query
      * @throws RuntimeException if a database access error occurs
      */
-    public void addBatch() {
+    public Q addBatch() {
         try {
             preparedStatement.addBatch();
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return getInstance();
     }
 
     /**
@@ -122,7 +133,7 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
             return !preparedStatement.isClosed();
         }
         catch (SQLException e) {
-            throw new RuntimeException(e);
+            return false;
         }
     }
 
@@ -142,17 +153,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, boolean value) {
+    public Q setParameter(int paramIndex, boolean value) {
         try {
             preparedStatement.setBoolean(paramIndex, value);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return this;
+        return getInstance();
     }
 
     /**
@@ -160,17 +171,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, byte value) {
+    public Q setParameter(int paramIndex, byte value) {
         try {
             preparedStatement.setByte(paramIndex, value);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return this;
+        return getInstance();
     }
 
     /**
@@ -178,17 +189,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, short value) {
+    public Q setParameter(int paramIndex, short value) {
         try {
             preparedStatement.setShort(paramIndex, value);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return this;
+        return getInstance();
     }
 
     /**
@@ -196,17 +207,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, int value) {
+    public Q setParameter(int paramIndex, int value) {
         try {
             preparedStatement.setInt(paramIndex, value);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return this;
+        return getInstance();
     }
 
     /**
@@ -214,17 +225,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, long value) {
+    public Q setParameter(int paramIndex, long value) {
         try {
             preparedStatement.setLong(paramIndex, value);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return this;
+        return getInstance();
     }
 
     /**
@@ -232,17 +243,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, float value) {
+    public Q setParameter(int paramIndex, float value) {
         try {
             preparedStatement.setFloat(paramIndex, value);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return this;
+        return getInstance();
     }
 
     /**
@@ -250,17 +261,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, double value) {
+    public Q setParameter(int paramIndex, double value) {
         try {
             preparedStatement.setDouble(paramIndex, value);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return this;
+        return getInstance();
     }
 
     /**
@@ -268,17 +279,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, BigDecimal value) {
+    public Q setParameter(int paramIndex, BigDecimal value) {
         try {
             preparedStatement.setBigDecimal(paramIndex, value);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return this;
+        return getInstance();
     }
 
     /**
@@ -286,17 +297,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, String value) {
+    public Q setParameter(int paramIndex, String value) {
         try {
             preparedStatement.setString(paramIndex, value);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return this;
+        return getInstance();
     }
 
     /**
@@ -304,17 +315,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, byte[] value) {
+    public Q setParameter(int paramIndex, byte[] value) {
         try {
             preparedStatement.setBytes(paramIndex, value);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return this;
+        return getInstance();
     }
 
     /**
@@ -322,17 +333,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, Date value) {
+    public Q setParameter(int paramIndex, Date value) {
         try {
             preparedStatement.setDate(paramIndex, value);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return this;
+        return getInstance();
     }
 
     /**
@@ -340,10 +351,10 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, LocalDate value) {
+    public Q setParameter(int paramIndex, LocalDate value) {
         Date date = null;
         if (value != null) {
             date = Date.valueOf(value);
@@ -356,17 +367,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, Time value) {
+    public Q setParameter(int paramIndex, Time value) {
         try {
             preparedStatement.setTime(paramIndex, value);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return this;
+        return getInstance();
     }
 
     /**
@@ -374,10 +385,10 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, LocalTime value) {
+    public Q setParameter(int paramIndex, LocalTime value) {
         Time time = null;
         if (value != null) {
             time = Time.valueOf(value);
@@ -390,17 +401,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, Timestamp value) {
+    public Q setParameter(int paramIndex, Timestamp value) {
         try {
             preparedStatement.setTimestamp(paramIndex, value);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return this;
+        return getInstance();
     }
 
     /**
@@ -408,10 +419,10 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, LocalDateTime value) {
+    public Q setParameter(int paramIndex, LocalDateTime value) {
         Timestamp timestamp = null;
         if (value != null) {
             timestamp = Timestamp.valueOf(value);
@@ -424,17 +435,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
-     * @return instance of this query
+     * @return instance of the specific query
      */
     @Override
-    public Query setParameter(int paramIndex, Object value) {
+    public Q setParameter(int paramIndex, Object value) {
         try {
             preparedStatement.setObject(paramIndex, value);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return this;
+        return getInstance();
     }
 
     /**
@@ -442,9 +453,9 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @param query the query to close
      *
-     * @see Query#close()
+     * @see AbstractQuery#close()
      */
-    public static void closeQuerySoftly(Query query) {
+    public static void closeQuerySoftly(AbstractQuery<?> query) {
         if (query != null && query.isActive()) {
             try {
                 query.close();
