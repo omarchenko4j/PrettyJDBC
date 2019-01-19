@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 /**
- * This internal interface provides methods for setting parameter values in a specific {@link org.prettyjdbc.core.query.Query}.
+ * This internal interface provides methods for setting parameter values in a specific {@link org.prettyjdbc.core.query.AbstractQuery}.
  *
  * @param <Q> type of return query to perform call chain
  *
  * @author Oleg Marchenko
  *
- * @see org.prettyjdbc.core.query.Query
+ * @see org.prettyjdbc.core.query.AbstractQuery
  */
 
 interface IndexedParameterQuerySetter<Q> {
