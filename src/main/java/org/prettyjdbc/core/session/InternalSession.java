@@ -2,6 +2,7 @@ package org.prettyjdbc.core.session;
 
 import org.prettyjdbc.core.query.AbstractQuery;
 import org.prettyjdbc.core.query.SimpleQuery;
+import org.prettyjdbc.core.query.TypedQuery;
 import org.prettyjdbc.core.transaction.InternalTransaction;
 import org.prettyjdbc.core.transaction.Transaction;
 import org.prettyjdbc.core.transaction.TransactionWork;
@@ -40,7 +41,7 @@ public class InternalSession implements Session {
     /**
      * A queue of associated queries with this session.
      */
-    private FixedSizeQueue<SimpleQuery> queries;
+    private FixedSizeQueue<AbstractQuery<?>> queries;
 
     public InternalSession(Connection connection) {
         this.connection = connection;
@@ -67,6 +68,16 @@ public class InternalSession implements Session {
         return query;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> TypedQuery<T> createTypedQuery(String sqlQuery, Class<T> resultType) {
+        TypedQuery<T> typedQuery = new TypedQuery<>(getNewStatement(sqlQuery), resultType);
+        bindQuery(typedQuery);
+        return typedQuery;
+    }
+
     private PreparedStatement getNewStatement(String sqlQuery) {
         try {
             return connection.prepareStatement(sqlQuery);
@@ -76,7 +87,7 @@ public class InternalSession implements Session {
         }
     }
 
-    private void bindQuery(SimpleQuery query) {
+    private void bindQuery(AbstractQuery<?> query) {
         queries.offer(query, AbstractQuery::closeQuerySoftly);
     }
 
