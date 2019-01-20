@@ -16,9 +16,14 @@ public class InternalTransaction implements Transaction {
     private final Connection connection;
     private TransactionStatus status;
 
+    private final boolean initialReadOnly;
+    private final int initialIsolationLevel;
+
     public InternalTransaction(Connection connection) {
         this.connection = connection;
         this.status = TransactionStatus.NOT_ACTIVE;
+        this.initialReadOnly = getReadOnlyInternal();
+        this.initialIsolationLevel = getIsolationLevelInternal();
     }
 
     /**
@@ -33,7 +38,7 @@ public class InternalTransaction implements Transaction {
 
     private void doBegin() {
         setAutoCommit(false);
-        status = TransactionStatus.ACTIVE;
+        changeStatus(TransactionStatus.ACTIVE);
     }
 
     /**
@@ -78,7 +83,13 @@ public class InternalTransaction implements Transaction {
 
     private void doComplete() {
         setAutoCommit(true);
-        status = TransactionStatus.COMPLETED;
+        changeStatus(TransactionStatus.COMPLETED);
+        setReadOnlyInternal(initialReadOnly);
+        setIsolationLevelInternal(initialIsolationLevel);
+    }
+
+    private void changeStatus(TransactionStatus status) {
+        this.status = status;
     }
 
     private void setAutoCommit(boolean autoCommit) {
@@ -103,11 +114,15 @@ public class InternalTransaction implements Transaction {
      */
     @Override
     public boolean isReadOnly() {
+        return getReadOnlyInternal();
+    }
+
+    private boolean getReadOnlyInternal() {
         try {
             return connection.isReadOnly();
         }
         catch (SQLException e) {
-            return false;
+            throw new RuntimeException(e);
         }
     }
 
@@ -119,6 +134,11 @@ public class InternalTransaction implements Transaction {
         if (status == TransactionStatus.ACTIVE) {
             throw new IllegalStateException("Read-only mode cannot be set for a transaction in status active");
         }
+
+        setReadOnlyInternal(readOnly);
+    }
+
+    private void setReadOnlyInternal(boolean readOnly) {
         try {
             connection.setReadOnly(readOnly);
         }
@@ -132,8 +152,12 @@ public class InternalTransaction implements Transaction {
      */
     @Override
     public TransactionIsolationLevel getIsolationLevel() {
+        return TransactionIsolationLevel.valueOf(getIsolationLevelInternal());
+    }
+
+    private int getIsolationLevelInternal() {
         try {
-            return TransactionIsolationLevel.valueOf(connection.getTransactionIsolation());
+            return connection.getTransactionIsolation();
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
@@ -148,8 +172,13 @@ public class InternalTransaction implements Transaction {
         if (status == TransactionStatus.ACTIVE) {
             throw new IllegalStateException("Isolation level cannot be set for a transaction in status active");
         }
+
+        setIsolationLevelInternal(isolationLevel.getIsolationLevel());
+    }
+
+    private void setIsolationLevelInternal(int isolationLevel) {
         try {
-            connection.setTransactionIsolation(isolationLevel.getIsolationLevel());
+            connection.setTransactionIsolation(isolationLevel);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
