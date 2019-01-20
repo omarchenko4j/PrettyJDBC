@@ -99,6 +99,64 @@ public class InternalTransaction implements Transaction {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isReadOnly() {
+        try {
+            return connection.isReadOnly();
+        }
+        catch (SQLException e) {
+            return false;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        if (status == TransactionStatus.ACTIVE) {
+            throw new IllegalStateException("Read-only mode cannot be set for a transaction in status active");
+        }
+        try {
+            connection.setReadOnly(readOnly);
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TransactionIsolationLevel getIsolationLevel() {
+        try {
+            return TransactionIsolationLevel.valueOf(connection.getTransactionIsolation());
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setIsolationLevel(TransactionIsolationLevel isolationLevel) {
+        if (status == TransactionStatus.ACTIVE) {
+            throw new IllegalStateException("Isolation level cannot be set for a transaction in status active");
+        }
+        try {
+            connection.setTransactionIsolation(isolationLevel.getIsolationLevel());
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Allows to immediately stop an active transaction, protecting against possible exceptions.
      *
      * @param transaction transaction to stop

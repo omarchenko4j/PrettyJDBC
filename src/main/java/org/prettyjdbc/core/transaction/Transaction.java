@@ -50,6 +50,45 @@ public interface Transaction {
      * In other words it does not check the status of the actual underlying transaction.
      *
      * @return the current local status of this transaction
+     * @see org.prettyjdbc.core.transaction.TransactionStatus
      */
     TransactionStatus getStatus();
+
+    /**
+     * Returns a read-only mode of the current <code>Transaction</code>.
+     *
+     * @return <code>true</code> if this <code>Connection</code> object is read-only;
+     *         <code>false</code> otherwise
+     */
+    boolean isReadOnly();
+
+    /**
+     * Puts this transaction in read-only mode as a hint to the driver to enable database optimizations.
+     * <br>
+     * <b>Note:</b> This method cannot be called during an active transaction.
+     *
+     * @param readOnly <code>true</code> enables read-only mode;
+     *                 <code>false</code> disables it
+     * @throws IllegalStateException if read-only mode is set to the active transaction
+     */
+    void setReadOnly(boolean readOnly);
+
+    /**
+     * Returns isolation level for the current <code>Transaction</code>.
+     *
+     * @return the current transaction isolation level
+     * @see org.prettyjdbc.core.transaction.TransactionIsolationLevel
+     */
+    TransactionIsolationLevel getIsolationLevel();
+
+    /**
+     * Changes the isolation level for the current <code>Transaction</code>.
+     * <br>
+     * <b>Note:</b> This method cannot be called during an active transaction.
+     *
+     * @param isolationLevel the transaction isolation level
+     * @throws IllegalStateException if the isolation level is set to the active transaction
+     * @see org.prettyjdbc.core.transaction.TransactionIsolationLevel
+     */
+    void setIsolationLevel(TransactionIsolationLevel isolationLevel);
 }

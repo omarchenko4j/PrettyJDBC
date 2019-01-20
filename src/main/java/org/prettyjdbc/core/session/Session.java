@@ -39,6 +39,7 @@ public interface Session extends Unwrapable<Connection>, AutoCloseable {
      * Creates a {@link TypedQuery} object for sending SQL statements to the database.
      * This object can then be used to efficiently execute this statement multiple times.
      *
+     * @param <T> specific type of object to create a typed query
      * @param sqlQuery an SQL query
      * @param type type of result object
      * @return a new <code>TypedQuery</code> object
@@ -46,20 +47,31 @@ public interface Session extends Unwrapable<Connection>, AutoCloseable {
     <T> TypedQuery<T> createTypedQuery(String sqlQuery, Class<T> type);
 
     /**
-     * Begins a unit of work and return the associated {@link Transaction} object.
-     * If a new underlying transaction is required, begin the transaction.
+     * Creates a new {@link Transaction} object without starting and associates it with the current <code>Session</code>.
+     * If an active transaction already exists then it will be rolled back.
+     * After creating a new transaction, it must be started using the method {@link Transaction#begin()}.
      *
-     * @return the associated {@link Transaction} object
+     * @return not active and associated {@link Transaction} object
+     * @throws RuntimeException if a database access error occurs
+     *  or this method is called when the session connection is closed
+     */
+    Transaction newTransaction();
+
+    /**
+     * Creates and starts a new unit of work and return the associated {@link Transaction} object.
+     * If an active transaction already exists then it will be returned.
+     *
+     * @return active and associated {@link Transaction} object
      * @throws RuntimeException if a database access error occurs
      *  or this method is called when the session connection is closed
      */
     Transaction beginTransaction();
 
     /**
-     * Returns the {@link Transaction} instance associated with this session.
+     * Returns the {@link Transaction} object associated with this session.
      *
      * @return the current associated transaction or <code>null</code>,
-     *  if the transaction has not been started.
+     *  if the transaction has not been created
      */
     Transaction getTransaction();
 

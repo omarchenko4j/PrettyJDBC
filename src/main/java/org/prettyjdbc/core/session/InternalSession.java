@@ -95,12 +95,27 @@ public class InternalSession implements Session {
      * {@inheritDoc}
      */
     @Override
+    public Transaction newTransaction() {
+        if (isActiveTransaction(transaction)) stopTransaction();
+
+        transaction = createTransaction();
+        return transaction;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Transaction beginTransaction() {
         if (isActiveTransaction(transaction)) return transaction;
 
-        transaction = new InternalTransaction(connection);
+        transaction = createTransaction();
         transaction.begin();
         return transaction;
+    }
+
+    private Transaction createTransaction() {
+        return new InternalTransaction(connection);
     }
 
     /**
