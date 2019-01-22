@@ -9,12 +9,12 @@ import org.prettyjdbc.core.session.InternalSession;
 import org.prettyjdbc.core.session.Session;
 import org.prettyjdbc.core.transaction.Transaction;
 import org.prettyjdbc.core.transaction.TransactionStatus;
+import org.prettyjdbc.core.util.DatabaseInitializer;
 import org.prettyjdbc.core.util.JDBCUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
  * @author Oleg Marchenko
@@ -23,25 +23,8 @@ import java.sql.Statement;
 public class SessionTest {
 
     @BeforeClass
-    public static void initDatabase() throws SQLException {
-        try(Connection connection = JDBCUtils.getConnection()) {
-            try(Statement statement = connection.createStatement()) {
-                statement.execute(
-                        "CREATE TABLE films(" +
-                                "id INTEGER NOT NULL, " +
-                                "original_name CHARACTER VARYING(120), " +
-                                "year SMALLINT)");
-            }
-        }
-    }
-
-    @AfterClass
-    public static void destroyDatabase() throws SQLException {
-        try(Connection connection = JDBCUtils.getConnection()) {
-            try(Statement statement = connection.createStatement()) {
-                statement.execute("DROP TABLE films");
-            }
-        }
+    public static void beforeTests() {
+        DatabaseInitializer.createDatabase();
     }
 
     @Test
@@ -161,5 +144,10 @@ public class SessionTest {
         Assert.assertFalse(session.isOpen());
         Assert.assertNull(session.getTransaction());
         Assert.assertEquals(transaction.getStatus(), TransactionStatus.COMPLETED);
+    }
+
+    @AfterClass
+    public static void afterTests() {
+        DatabaseInitializer.destroyDatabase();
     }
 }

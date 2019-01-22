@@ -8,6 +8,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.prettyjdbc.core.query.SimpleQuery;
 import org.prettyjdbc.core.query.scrollable_result.ReadOnlyScrollableResult;
+import org.prettyjdbc.core.util.DatabaseInitializer;
 import org.prettyjdbc.core.util.JDBCUtils;
 
 import java.math.BigDecimal;
@@ -23,30 +24,8 @@ import java.time.LocalTime;
 public class SimpleQueryTest {
 
     @BeforeClass
-    public static void initDatabase() throws SQLException {
-        try(Connection connection = JDBCUtils.getConnection()) {
-            try(Statement statement = connection.createStatement()) {
-                statement.execute(
-                "CREATE TABLE films(" +
-                        "id INTEGER NOT NULL, " +
-                        "original_name CHARACTER VARYING(120), " +
-                        "year SMALLINT)");
-                statement.execute("INSERT INTO films VALUES " +
-                        "(1, 'The Lord of the Rings: The Fellowship of the Ring', 2001), " +
-                        "(2, 'The Lord of the Rings: The Two Towers', 2002), " +
-                        "(3, 'The Lord of the Rings: The Return of the King', 2003)"
-                );
-            }
-        }
-    }
-
-    @AfterClass
-    public static void destroyDatabase() throws SQLException {
-        try(Connection connection = JDBCUtils.getConnection()) {
-            try(Statement statement = connection.createStatement()) {
-                statement.execute("DROP TABLE films");
-            }
-        }
+    public static void beforeTests() {
+        DatabaseInitializer.createAndInitDatabase();
     }
 
     @Test
@@ -299,5 +278,10 @@ public class SimpleQueryTest {
         query.setParameter(1, LocalDateTime.now());
 
         Mockito.verify(preparedStatement).setTimestamp(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Timestamp.class));
+    }
+
+    @AfterClass
+    public static void afterTests() {
+        DatabaseInitializer.destroyDatabase();
     }
 }
