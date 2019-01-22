@@ -47,10 +47,10 @@ public enum TransactionIsolationLevel {
      */
     SERIALIZABLE(TRANSACTION_SERIALIZABLE);
 
-    private final int isolationLevel;
+    private final int nativeLevel;
 
-    TransactionIsolationLevel(int isolationLevel) {
-        this.isolationLevel = isolationLevel;
+    TransactionIsolationLevel(int nativeLevel) {
+        this.nativeLevel = nativeLevel;
     }
 
     /**
@@ -58,8 +58,8 @@ public enum TransactionIsolationLevel {
      *
      * @return number as current transaction isolation level
      */
-    public int getIsolationLevel() {
-        return isolationLevel;
+    public int nativeLevel() {
+        return nativeLevel;
     }
 
     /**

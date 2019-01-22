@@ -173,7 +173,7 @@ public class InternalTransaction implements Transaction {
             throw new IllegalStateException("Isolation level cannot be set for a transaction in status active");
         }
 
-        setIsolationLevelInternal(isolationLevel.getIsolationLevel());
+        setIsolationLevelInternal(isolationLevel.nativeLevel());
     }
 
     private void setIsolationLevelInternal(int isolationLevel) {
