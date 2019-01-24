@@ -24,6 +24,10 @@ import java.sql.SQLException;
  */
 
 public final class SessionFactory implements Unwrapable<DataSource> {
+    /**
+     * Active session within the current thread.
+     */
+    private static final ThreadLocal<Session> CURRENT_SESSION = new ThreadLocal<>();
 
     private final DataSource dataSource;
 
@@ -42,7 +46,7 @@ public final class SessionFactory implements Unwrapable<DataSource> {
     }
 
     /**
-     * Creates a new {@link Session} between application and database.
+     * Creates a new {@link Session} between Java application and relational database.
      * The session will be obtained as is and management must occur from outside.
      * Usually work with this method occurs in conjunction with try-with-resources
      * because the session is {@link AutoCloseable}.
@@ -63,13 +67,23 @@ public final class SessionFactory implements Unwrapable<DataSource> {
     }
 
     /**
-     * This method is the entry point for creating a <code>SessionFactory</code> based on {@link DataSource}.
+     * Returns a session within the current thread.
+     * If the current session has not yet been created or is no longer active
+     * then a new session will be opened ({@link SessionFactory#openSession()}) and bound to the current thread.
      *
-     * @param supplier data source provider
-     * @return a new session factory
+     * @return the current session
      */
-    public static SessionFactory create(DataSourceSupplier supplier) {
-        return new SessionFactory(supplier.get());
+    public Session getCurrentSession() {
+        return openOrObtainSession();
+    }
+
+    private Session openOrObtainSession() {
+        Session session = CURRENT_SESSION.get();
+        if (session == null) {
+            session = openSession();
+            doBindSession(session);
+        }
+        return session;
     }
 
     /**
@@ -81,5 +95,55 @@ public final class SessionFactory implements Unwrapable<DataSource> {
      */
     public static Session newSession(Connection connection) {
         return new InternalSession(connection);
+    }
+
+    /**
+     * Binds a session to the current thread.
+     * If the current thread already has an active session then it will be forcibly terminated.
+     *
+     * @param session a new session
+     */
+    public static void bindSession(Session session) {
+        forcedTerminateCurrentSession();
+        doBindSession(session);
+    }
+
+    private static void doBindSession(Session session) {
+        CURRENT_SESSION.set(session);
+    }
+
+    /**
+     * Unbinds a session from the current thread.
+     * The session will be unbind from the current thread and forcibly terminated.
+     * If the current session was incomplete active transaction then it will be forcibly rolled back.
+     */
+    public static void unbindSession() {
+        forcedTerminateCurrentSession();
+        doUnbindSession();
+    }
+
+    private static void doUnbindSession() {
+        CURRENT_SESSION.remove();
+    }
+
+    private static void forcedTerminateCurrentSession() {
+        Session currentSession = CURRENT_SESSION.get();
+        if (currentSession != null && currentSession.isOpen()) {
+            currentSession.close();
+        }
+    }
+
+    /**
+     * This method is the entry point for creating a <code>SessionFactory</code> based on {@link DataSource}.
+     *
+     * @param supplier data source provider
+     * @return a new session factory
+     */
+    public static SessionFactory create(DataSourceSupplier supplier) {
+        DataSource dataSource = supplier.get();
+        if (dataSource == null) {
+            throw new NullPointerException("Data source is null");
+        }
+        return new SessionFactory(dataSource);
     }
 }
