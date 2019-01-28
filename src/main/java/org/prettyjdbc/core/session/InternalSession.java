@@ -1,20 +1,19 @@
 package org.prettyjdbc.core.session;
 
 import org.prettyjdbc.core.query.AbstractQuery;
+import org.prettyjdbc.core.query.NamedParameterQuery;
 import org.prettyjdbc.core.query.SimpleQuery;
 import org.prettyjdbc.core.query.TypedQuery;
 import org.prettyjdbc.core.transaction.InternalTransaction;
 import org.prettyjdbc.core.transaction.Transaction;
 import org.prettyjdbc.core.transaction.TransactionWork;
 import org.prettyjdbc.core.transaction.TransactionWorkWithResult;
+import org.prettyjdbc.core.util.NamedParameterQueryProcessor;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.AbstractQueue;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import java.util.Queue;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static org.prettyjdbc.core.transaction.InternalTransaction.isActiveTransaction;
@@ -25,8 +24,6 @@ import static org.prettyjdbc.core.transaction.InternalTransaction.isActiveTransa
  * @author Oleg Marchenko
  *
  * @see org.prettyjdbc.core.session.Session
- * @see org.prettyjdbc.core.transaction.Transaction
- * @see org.prettyjdbc.core.query.SimpleQuery
  */
 
 public class InternalSession implements Session {
@@ -76,6 +73,22 @@ public class InternalSession implements Session {
         TypedQuery<T> typedQuery = new TypedQuery<>(getNewStatement(sqlQuery), resultType);
         bindQuery(typedQuery);
         return typedQuery;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> NamedParameterQuery<T> createNamedParameterQuery(String sqlQuery, Class<T> type) {
+        NamedParameterQueryProcessor queryProcessor = new NamedParameterQueryProcessor(sqlQuery);
+        queryProcessor.process();
+
+        String nativeQuery = queryProcessor.getNativeQuery();
+        List<String> parameters = queryProcessor.getParameters();
+
+        NamedParameterQuery<T> namedParameterQuery = new NamedParameterQuery<>(getNewStatement(nativeQuery), parameters, type);
+        bindQuery(namedParameterQuery);
+        return namedParameterQuery;
     }
 
     private PreparedStatement getNewStatement(String sqlQuery) {

@@ -1,6 +1,7 @@
 package org.prettyjdbc.core.session;
 
 import org.prettyjdbc.core.Unwrapable;
+import org.prettyjdbc.core.query.NamedParameterQuery;
 import org.prettyjdbc.core.query.SimpleQuery;
 import org.prettyjdbc.core.query.TypedQuery;
 import org.prettyjdbc.core.transaction.Transaction;
@@ -22,6 +23,8 @@ import java.sql.Connection;
  *
  * @see org.prettyjdbc.core.transaction.Transaction
  * @see org.prettyjdbc.core.query.SimpleQuery
+ * @see org.prettyjdbc.core.query.TypedQuery
+ * @see org.prettyjdbc.core.query.NamedParameterQuery
  */
 
 public interface Session extends Unwrapable<Connection>, AutoCloseable {
@@ -45,6 +48,19 @@ public interface Session extends Unwrapable<Connection>, AutoCloseable {
      * @return a new <code>TypedQuery</code> object
      */
     <T> TypedQuery<T> createTypedQuery(String sqlQuery, Class<T> type);
+
+    /**
+     * Creates a {@link NamedParameterQuery} object with named parameters for sending SQL statements to the database.
+     * This object can then be used to efficiently execute this statement multiple times.
+     * <br>
+     * Named parameters are defined as patterns: ":paramName" or ":{paramName}" where "paramName" is name of parameter.
+     *
+     * @param <T> specific type of object to create a named parameter query
+     * @param sqlQuery an SQL query
+     * @param type type of result object
+     * @return a new <code>NamedParameterQuery</code> object
+     */
+    <T> NamedParameterQuery<T> createNamedParameterQuery(String sqlQuery, Class<T> type);
 
     /**
      * Creates a new {@link Transaction} object without starting and associates it with the current <code>Session</code>.
