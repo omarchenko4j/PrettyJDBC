@@ -1,6 +1,9 @@
 package com.github.marchenkoprojects.prettyjdbc;
 
+import com.github.marchenkoprojects.prettyjdbc.model.Film;
+import com.github.marchenkoprojects.prettyjdbc.query.NamedParameterQuery;
 import com.github.marchenkoprojects.prettyjdbc.query.SimpleQuery;
+import com.github.marchenkoprojects.prettyjdbc.query.TypedQuery;
 import com.github.marchenkoprojects.prettyjdbc.session.InternalSession;
 import com.github.marchenkoprojects.prettyjdbc.session.Session;
 import com.github.marchenkoprojects.prettyjdbc.transaction.Transaction;
@@ -28,18 +31,72 @@ public class SessionTest {
     }
 
     @Test
-    public void testCreateQuery() throws SQLException {
+    public void testCreateQuery() {
         Session session = SessionFactory.newSession(JDBCUtils.getConnection());
 
-        SimpleQuery query = session.createQuery("SELECT id, original_name, year FROM films WHERE id = ?");
+        SimpleQuery query = session
+                .createQuery("SELECT id, original_name, year FROM films WHERE id = ?");
         Assert.assertNotNull(query);
         Assert.assertTrue(query.isActive());
 
-        PreparedStatement preparedStatement = query.unwrap();
+        session.close();
+    }
+
+    @Test
+    public void testCreateTypedQuery() {
+        Session session = SessionFactory.newSession(JDBCUtils.getConnection());
+
+        TypedQuery<Film> typedQuery = session
+                .createTypedQuery("SELECT id, original_name, year FROM films WHERE id = ?", Film.class);
+        Assert.assertNotNull(typedQuery);
+        Assert.assertTrue(typedQuery.isActive());
+
+        session.close();
+    }
+
+    @Test
+    public void testCreateNamedParameterQuery() {
+        Session session = SessionFactory.newSession(JDBCUtils.getConnection());
+
+        NamedParameterQuery<Film> namedParameterQuery = session
+                .createNamedParameterQuery("SELECT id, original_name, year FROM films WHERE id = ?", Film.class);
+        Assert.assertNotNull(namedParameterQuery);
+        Assert.assertTrue(namedParameterQuery.isActive());
+
+        session.close();
+    }
+
+    @Test
+    public void testCloseAllQueriesWhenSessionCloses() throws SQLException {
+        Connection connection = JDBCUtils.getConnection();
+
+        Session session = new InternalSession(connection);
+        Assert.assertTrue(session.isOpen());
+
+        SimpleQuery query = session
+                .createQuery("INSERT INTO films VALUES (?, ?, ?)");
+        PreparedStatement queryStatement = query.unwrap();
+        Assert.assertTrue(query.isActive());
+        Assert.assertFalse(queryStatement.isClosed());
+
+        TypedQuery<Film> typedQuery = session
+                .createTypedQuery("SELECT id, original_name, year FROM films WHERE id = ?", Film.class);
+        PreparedStatement typedQueryStatement = typedQuery.unwrap();
+        Assert.assertTrue(typedQuery.isActive());
+        Assert.assertFalse(typedQueryStatement.isClosed());
+
+        NamedParameterQuery<Film> namedParameterQuery = session
+                .createNamedParameterQuery("SELECT * FROM films OFFSET :offset LIMIT :limit", Film.class);
+        PreparedStatement namedParameterQueryStatement = namedParameterQuery.unwrap();
+        Assert.assertTrue(namedParameterQuery.isActive());
+        Assert.assertFalse(namedParameterQueryStatement.isClosed());
 
         session.close();
         Assert.assertFalse(session.isOpen());
-        Assert.assertTrue(preparedStatement.isClosed());
+
+        Assert.assertTrue(queryStatement.isClosed());
+        Assert.assertTrue(typedQueryStatement.isClosed());
+        Assert.assertTrue(namedParameterQueryStatement.isClosed());
     }
 
     @Test
