@@ -20,9 +20,8 @@ import java.sql.SQLException;
  *
  * @author Oleg Marchenko
  *
- * @see com.github.marchenkoprojects.prettyjdbc.session.Session
+ * @see Session
  */
-
 public final class SessionFactory implements Unwrapable<DataSource> {
     /**
      * Active session within the current thread.

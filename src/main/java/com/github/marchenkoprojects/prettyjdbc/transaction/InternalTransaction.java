@@ -8,9 +8,8 @@ import java.sql.SQLException;
  *
  * @author Oleg Marchenko
  *
- * @see com.github.marchenkoprojects.prettyjdbc.transaction.Transaction
+ * @see Transaction
  */
-
 public class InternalTransaction implements Transaction {
 
     private final Connection connection;

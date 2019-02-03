@@ -1,11 +1,10 @@
 package com.github.marchenkoprojects.prettyjdbc.transaction;
 
 /**
- * Enumeration of statuses in which a transaction facade ({@link com.github.marchenkoprojects.prettyjdbc.transaction.Transaction}) might be.
+ * Enumeration of statuses in which a transaction facade ({@link Transaction}) might be.
  *
  * @author Oleg Marchenko
  */
-
 public enum TransactionStatus {
     /**
      * The transaction has not yet been started.

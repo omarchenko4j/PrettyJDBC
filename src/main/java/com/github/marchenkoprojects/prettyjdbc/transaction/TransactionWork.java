@@ -7,9 +7,8 @@ import com.github.marchenkoprojects.prettyjdbc.session.Session;
  *
  * @author Oleg Marchenko
  *
- * @see com.github.marchenkoprojects.prettyjdbc.session.Session#doInTransaction(TransactionWork)
+ * @see Session#doInTransaction(TransactionWork)
  */
-
 @FunctionalInterface
 public interface TransactionWork {
 

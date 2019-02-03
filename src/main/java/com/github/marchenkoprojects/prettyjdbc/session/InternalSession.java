@@ -23,9 +23,8 @@ import static com.github.marchenkoprojects.prettyjdbc.transaction.InternalTransa
  *
  * @author Oleg Marchenko
  *
- * @see com.github.marchenkoprojects.prettyjdbc.session.Session
+ * @see Session
  */
-
 public class InternalSession implements Session {
     private static final int MAX_NUMBER_OF_ASSOCIATED_QUERIES = 16;
 
@@ -224,7 +223,7 @@ public class InternalSession implements Session {
      *
      * @author Oleg Marchenko
      *
-     * @see java.util.Queue
+     * @see Queue
      */
     private static class FixedSizeQueue<E> extends AbstractQueue<E> {
 

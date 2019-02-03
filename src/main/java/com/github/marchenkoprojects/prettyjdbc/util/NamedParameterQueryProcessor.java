@@ -11,7 +11,6 @@ import java.util.stream.Stream;
  *
  * @author Oleg Marchenko
  */
-
 public class NamedParameterQueryProcessor {
     private static final Set<Character> PARAMETER_SEPARATORS = getParameterSeparators();
     private static final String SQL_PARAMETER = "?";

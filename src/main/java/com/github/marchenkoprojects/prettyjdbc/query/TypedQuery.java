@@ -20,10 +20,9 @@ import java.util.List;
  *
  * @author Oleg Marchenko
  *
- * @see com.github.marchenkoprojects.prettyjdbc.query.AbstractQuery
- * @see com.github.marchenkoprojects.prettyjdbc.mapper.ResultMapper
+ * @see AbstractQuery
+ * @see ResultMapper
  */
-
 public class TypedQuery<T> extends AbstractQuery<TypedQuery<T>> {
 
     private final Class<T> resultType;
@@ -60,7 +59,7 @@ public class TypedQuery<T> extends AbstractQuery<TypedQuery<T>> {
      * @throws IllegalStateException if the result mapper is null
      * @throws RuntimeException if a database access error occurs
      *  or this method is called when the session connection is closed
-     * @see com.github.marchenkoprojects.prettyjdbc.mapper.ResultMapper#unique(ResultSet)
+     * @see ResultMapper#unique(ResultSet)
      */
     public T unique() {
         checkMapperPresent();
@@ -80,7 +79,7 @@ public class TypedQuery<T> extends AbstractQuery<TypedQuery<T>> {
      * @throws IllegalStateException if the result mapper is null
      * @throws RuntimeException if a database access error occurs
      *  or this method is called when the session connection is closed
-     * @see com.github.marchenkoprojects.prettyjdbc.mapper.ResultMapper#list(ResultSet)
+     * @see ResultMapper#list(ResultSet)
      */
     public List<T> list() {
         checkMapperPresent();

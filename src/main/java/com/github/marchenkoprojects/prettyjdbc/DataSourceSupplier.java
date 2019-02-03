@@ -8,9 +8,8 @@ import java.util.function.Supplier;
  *
  * @author Oleg Marchenko
  *
- * @see com.github.marchenkoprojects.prettyjdbc.SessionFactory#create(DataSourceSupplier)
+ * @see SessionFactory#create(DataSourceSupplier)
  */
-
 @FunctionalInterface
 public interface DataSourceSupplier extends Supplier<DataSource> {
 

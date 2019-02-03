@@ -7,7 +7,6 @@ package com.github.marchenkoprojects.prettyjdbc;
  *
  * @author Oleg Marchenko
  */
-
 public interface Unwrapable<T> {
 
     /**

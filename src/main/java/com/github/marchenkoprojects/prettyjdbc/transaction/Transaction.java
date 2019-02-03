@@ -15,9 +15,8 @@ import com.github.marchenkoprojects.prettyjdbc.session.Session;
  *
  * @author Oleg Marchenko
  *
- * @see com.github.marchenkoprojects.prettyjdbc.session.Session
+ * @see Session
  */
-
 public interface Transaction {
 
     /**
@@ -52,7 +51,7 @@ public interface Transaction {
      * In other words it does not check the status of the actual underlying transaction.
      *
      * @return the current local status of this transaction
-     * @see com.github.marchenkoprojects.prettyjdbc.transaction.TransactionStatus
+     * @see TransactionStatus
      */
     TransactionStatus getStatus();
 
@@ -79,7 +78,7 @@ public interface Transaction {
      * Returns isolation level for the current <code>Transaction</code>.
      *
      * @return the current transaction isolation level
-     * @see com.github.marchenkoprojects.prettyjdbc.transaction.TransactionIsolationLevel
+     * @see TransactionIsolationLevel
      */
     TransactionIsolationLevel getIsolationLevel();
 
@@ -90,7 +89,6 @@ public interface Transaction {
      *
      * @param isolationLevel the transaction isolation level
      * @throws IllegalStateException if the isolation level is set to the active transaction
-     * @see com.github.marchenkoprojects.prettyjdbc.transaction.TransactionIsolationLevel
      */
     void setIsolationLevel(TransactionIsolationLevel isolationLevel);
 }

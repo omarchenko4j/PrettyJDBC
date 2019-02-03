@@ -13,9 +13,8 @@ import java.time.LocalTime;
  *
  * @author Oleg Marchenko
  *
- * @see com.github.marchenkoprojects.prettyjdbc.query.scrollable_result.ReadOnlyScrollableResult
+ * @see ReadOnlyScrollableResult
  */
-
 interface IndexedColumnValueGetter {
 
     /**

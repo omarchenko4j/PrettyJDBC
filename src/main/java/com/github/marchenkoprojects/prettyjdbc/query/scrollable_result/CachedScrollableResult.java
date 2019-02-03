@@ -15,9 +15,8 @@ import java.util.Map;
  *
  * @author Oleg Marchenko
  *
- * @see com.github.marchenkoprojects.prettyjdbc.query.scrollable_result.ReadOnlyScrollableResult
+ * @see ReadOnlyScrollableResult
  */
-
 public class CachedScrollableResult implements ReadOnlyScrollableResult {
     private static int DEFAULT_ROWS_CAPACITY = 64;
     private static int BEFORE_FIRST_ROW_INDEX = -1;

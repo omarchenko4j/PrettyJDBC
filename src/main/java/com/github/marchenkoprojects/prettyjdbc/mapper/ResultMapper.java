@@ -12,7 +12,6 @@ import java.util.List;
  *
  * @author Oleg Marchenko
  */
-
 @FunctionalInterface
 public interface ResultMapper<T> {
 

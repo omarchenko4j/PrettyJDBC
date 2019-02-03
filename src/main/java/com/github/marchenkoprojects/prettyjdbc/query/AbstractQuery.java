@@ -24,9 +24,8 @@ import java.time.LocalTime;
  *
  * @author Oleg Marchenko
  *
- * @see com.github.marchenkoprojects.prettyjdbc.query.scrollable_result.ReadOnlyScrollableResult
+ * @see ReadOnlyScrollableResult
  */
-
 public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>, AutoCloseable, IndexedParameterQuerySetter<Q> {
 
     protected final PreparedStatement preparedStatement;
@@ -149,11 +148,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java <code>boolean</code> value.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, boolean value) {
@@ -167,11 +162,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java <code>byte</code> value.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, byte value) {
@@ -185,11 +176,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java <code>short</code> value.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, short value) {
@@ -203,11 +190,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java <code>int</code> value.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, int value) {
@@ -221,11 +204,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java <code>long</code> value.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, long value) {
@@ -239,11 +218,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java <code>float</code> value.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, float value) {
@@ -257,11 +232,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java <code>double</code> value.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, double value) {
@@ -275,11 +246,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java <code>java.math.BigDecimal</code> value.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, BigDecimal value) {
@@ -293,11 +260,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java <code>String</code> value.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, String value) {
@@ -311,11 +274,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java array of bytes.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, byte[] value) {
@@ -329,11 +288,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java <code>java.sql.Date</code> value.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, Date value) {
@@ -347,11 +302,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java <code>java.time.LocalDate</code> value as <code>java.sql.Date</code>.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, LocalDate value) {
@@ -363,11 +314,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java <code>java.sql.Time</code> value.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, Time value) {
@@ -381,11 +328,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java <code>java.time.LocalTime</code> value as <code>java.sql.Time</code>.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, LocalTime value) {
@@ -397,11 +340,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java <code>java.sql.Timestamp</code> value.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, Timestamp value) {
@@ -415,11 +354,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the designated parameter to the given Java <code>java.time.LocalDateTime</code> value as <code>java.sql.Timestamp</code>.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, LocalDateTime value) {
@@ -431,11 +366,7 @@ public abstract class AbstractQuery<Q> implements Unwrapable<PreparedStatement>,
     }
 
     /**
-     * Sets the value of the designated parameter with the given object.
-     *
-     * @param paramIndex the index of the parameter which must begin with 1
-     * @param value the parameter value
-     * @return instance of the specific query
+     * {@inheritDoc}
      */
     @Override
     public Q setParameter(int paramIndex, Object value) {

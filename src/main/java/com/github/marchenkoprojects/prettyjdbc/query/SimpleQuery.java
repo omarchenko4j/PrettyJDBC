@@ -7,9 +7,8 @@ import java.sql.PreparedStatement;
  *
  * @author Oleg Marchenko
  *
- * @see com.github.marchenkoprojects.prettyjdbc.query.AbstractQuery
+ * @see AbstractQuery
  */
-
 public class SimpleQuery extends AbstractQuery<SimpleQuery> {
 
     public SimpleQuery(PreparedStatement preparedStatement) {

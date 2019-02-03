@@ -19,9 +19,8 @@ import java.util.Map;
  *
  * @author Oleg Marchenko
  *
- * @see com.github.marchenkoprojects.prettyjdbc.query.TypedQuery
+ * @see TypedQuery
  */
-
 public class NamedParameterQuery<T> extends TypedQuery<T> implements NamedParameterQuerySetter<NamedParameterQuery<T>> {
 
     private final Map<String, Integer> paramNameToIndex;

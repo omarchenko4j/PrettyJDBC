@@ -21,12 +21,11 @@ import java.sql.Connection;
  *
  * @author Oleg Marchenko
  *
- * @see com.github.marchenkoprojects.prettyjdbc.transaction.Transaction
- * @see com.github.marchenkoprojects.prettyjdbc.query.SimpleQuery
- * @see com.github.marchenkoprojects.prettyjdbc.query.TypedQuery
- * @see com.github.marchenkoprojects.prettyjdbc.query.NamedParameterQuery
+ * @see Transaction
+ * @see SimpleQuery
+ * @see TypedQuery
+ * @see NamedParameterQuery
  */
-
 public interface Session extends Unwrapable<Connection>, AutoCloseable {
 
     /**

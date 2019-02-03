@@ -4,7 +4,8 @@ import static java.sql.Connection.*;
 
 /**
  * Describes the basic levels of transaction isolation.
- * Transaction isolation level with varying degrees provide data integrity when simultaneously processing a plurality of processes.
+ * Transaction isolation level with varying degrees provide data integrity
+ * when simultaneously processing a plurality of processes.
  *
  * @author Oleg Marchenko
  * @see java.sql.Connection#TRANSACTION_NONE

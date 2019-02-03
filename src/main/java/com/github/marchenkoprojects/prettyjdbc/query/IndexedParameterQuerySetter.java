@@ -9,13 +9,12 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 /**
- * This internal interface provides methods for setting parameter values by index in a specific {@link com.github.marchenkoprojects.prettyjdbc.query.AbstractQuery}.
+ * This internal interface provides methods for setting parameter values by index in a specific {@link AbstractQuery}.
  *
  * @param <Q> type of return query to perform call chain
  *
  * @author Oleg Marchenko
  */
-
 interface IndexedParameterQuerySetter<Q> {
 
     /**
@@ -82,7 +81,7 @@ interface IndexedParameterQuerySetter<Q> {
     Q setParameter(int paramIndex, double value);
 
     /**
-     * Sets the designated parameter by index to the given Java {@link java.math.BigDecimal} value.
+     * Sets the designated parameter by index to the given Java {@link BigDecimal} value.
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
@@ -109,7 +108,7 @@ interface IndexedParameterQuerySetter<Q> {
     Q setParameter(int paramIndex, byte[] value);
 
     /**
-     * Sets the designated parameter by index to the given Java {@link java.sql.Date} value.
+     * Sets the designated parameter by index to the given Java {@link Date} value.
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
@@ -118,7 +117,7 @@ interface IndexedParameterQuerySetter<Q> {
     Q setParameter(int paramIndex, Date value);
 
     /**
-     * Sets the designated parameter by index to the given Java {@link java.time.LocalDate} value as {@link java.sql.Date}.
+     * Sets the designated parameter by index to the given Java {@link LocalDate} value as {@link Date}.
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
@@ -127,7 +126,7 @@ interface IndexedParameterQuerySetter<Q> {
     Q setParameter(int paramIndex, LocalDate value);
 
     /**
-     * Sets the designated parameter by index to the given Java {@link java.sql.Time} value.
+     * Sets the designated parameter by index to the given Java {@link Time} value.
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
@@ -136,7 +135,7 @@ interface IndexedParameterQuerySetter<Q> {
     Q setParameter(int paramIndex, Time value);
 
     /**
-     * Sets the designated parameter by index to the given Java {@link java.time.LocalTime} value as {@link java.sql.Time}.
+     * Sets the designated parameter by index to the given Java {@link LocalTime} value as {@link Time}.
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
@@ -145,7 +144,7 @@ interface IndexedParameterQuerySetter<Q> {
     Q setParameter(int paramIndex, LocalTime value);
 
     /**
-     * Sets the designated parameter by index to the given Java {@link java.sql.Timestamp} value.
+     * Sets the designated parameter by index to the given Java {@link Timestamp} value.
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value
@@ -154,7 +153,7 @@ interface IndexedParameterQuerySetter<Q> {
     Q setParameter(int paramIndex, Timestamp value);
 
     /**
-     * Sets the designated parameter by index to the given Java {@link java.time.LocalDateTime} value as {@link java.sql.Timestamp}.
+     * Sets the designated parameter by index to the given Java {@link LocalDateTime} value as {@link Timestamp}.
      *
      * @param paramIndex the index of the parameter which must begin with 1
      * @param value the parameter value

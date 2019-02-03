@@ -5,10 +5,9 @@ package com.github.marchenkoprojects.prettyjdbc.query.scrollable_result;
  *
  * @author Oleg Marchenko
  *
- * @see com.github.marchenkoprojects.prettyjdbc.query.scrollable_result.IndexedColumnValueGetter
- * @see com.github.marchenkoprojects.prettyjdbc.query.scrollable_result.NamedColumnValueGetter
+ * @see IndexedColumnValueGetter
+ * @see NamedColumnValueGetter
  */
-
 public interface ReadOnlyScrollableResult extends IndexedColumnValueGetter, NamedColumnValueGetter {
 
     /**
