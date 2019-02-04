@@ -5,6 +5,7 @@ import com.github.marchenkoprojects.prettyjdbc.mapper.ResultMapper;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,13 +60,15 @@ public class TypedQuery<T> extends AbstractQuery<TypedQuery<T>> {
      * @throws IllegalStateException if the result mapper is null
      * @throws RuntimeException if a database access error occurs
      *  or this method is called when the session connection is closed
-     * @see ResultMapper#unique(ResultSet)
      */
     public T unique() {
         checkMapperPresent();
 
         try (ResultSet resultSet = preparedStatement.executeQuery()) {
-            return resultMapper.unique(resultSet);
+            if (resultSet.next()) {
+                return resultMapper.map(resultSet);
+            }
+            return null;
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
@@ -79,13 +82,16 @@ public class TypedQuery<T> extends AbstractQuery<TypedQuery<T>> {
      * @throws IllegalStateException if the result mapper is null
      * @throws RuntimeException if a database access error occurs
      *  or this method is called when the session connection is closed
-     * @see ResultMapper#list(ResultSet)
      */
     public List<T> list() {
         checkMapperPresent();
 
         try (ResultSet resultSet = preparedStatement.executeQuery()) {
-            return resultMapper.list(resultSet);
+            List<T> list = new ArrayList<>(32);
+            while (resultSet.next()) {
+                list.add(resultMapper.map(resultSet));
+            }
+            return list;
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
@@ -94,7 +100,7 @@ public class TypedQuery<T> extends AbstractQuery<TypedQuery<T>> {
 
     private void checkMapperPresent() {
         if (resultMapper == null) {
-            throw new IllegalStateException("No result mapper for type " + resultType.getSimpleName());
+            throw new IllegalStateException("No result mapper for type \"" + resultType.getSimpleName() + "\"");
         }
     }
 }
