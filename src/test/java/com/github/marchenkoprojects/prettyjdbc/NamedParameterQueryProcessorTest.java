@@ -9,7 +9,6 @@ import java.util.List;
 /**
  * @author Oleg Marchenko
  */
-
 public class NamedParameterQueryProcessorTest {
 
     @Test

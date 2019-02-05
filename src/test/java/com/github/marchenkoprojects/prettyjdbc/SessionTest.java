@@ -22,7 +22,6 @@ import java.sql.SQLException;
 /**
  * @author Oleg Marchenko
  */
-
 public class SessionTest {
 
     @BeforeClass

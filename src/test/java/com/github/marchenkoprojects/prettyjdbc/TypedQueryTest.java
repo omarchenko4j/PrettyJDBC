@@ -15,7 +15,6 @@ import java.util.List;
 /**
  * @author Oleg Marchenko
  */
-
 public class TypedQueryTest {
 
     @BeforeClass

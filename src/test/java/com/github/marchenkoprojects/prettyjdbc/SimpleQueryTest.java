@@ -20,7 +20,6 @@ import java.time.LocalTime;
 /**
  * @author Oleg Marchenko
  */
-
 public class SimpleQueryTest {
 
     @BeforeClass

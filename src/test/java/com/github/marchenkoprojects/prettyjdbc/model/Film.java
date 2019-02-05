@@ -3,7 +3,6 @@ package com.github.marchenkoprojects.prettyjdbc.model;
 /**
  * @author Oleg Marchenko
  */
-
 public class Film {
 
     private int id;

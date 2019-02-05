@@ -7,7 +7,6 @@ import java.sql.Statement;
 /**
  * @author Oleg Marchenko
  */
-
 public final class DatabaseInitializer {
 
     public static void createDatabase() {

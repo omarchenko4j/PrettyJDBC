@@ -12,7 +12,6 @@ import org.junit.Test;
 /**
  * @author Oleg Marchenko
  */
-
 public class NamedParameterQueryTest {
 
     @BeforeClass

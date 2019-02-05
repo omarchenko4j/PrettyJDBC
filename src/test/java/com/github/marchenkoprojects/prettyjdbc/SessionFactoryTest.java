@@ -12,7 +12,6 @@ import java.sql.SQLException;
 /**
  * @author Oleg Marchenko
  */
-
 public class SessionFactoryTest {
 
     @Test
@@ -22,6 +21,11 @@ public class SessionFactoryTest {
         SessionFactory sessionFactory = SessionFactory.create(() -> dataSource);
         Assert.assertNotNull(sessionFactory);
         Assert.assertEquals(dataSource, sessionFactory.unwrap());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testCreateSessionFactoryWithNullDataSource() {
+        SessionFactory.create(() -> null);
     }
 
     @Test
@@ -50,5 +54,41 @@ public class SessionFactoryTest {
             Assert.assertTrue(session.isOpen());
         }
         Mockito.verify(connection).close();
+    }
+
+    @Test
+    public void testBindSession() {
+        Session session = Mockito.mock(Session.class);
+
+        SessionFactory.bindSession(session);
+
+        SessionFactory sessionFactory = SessionFactory.create(() -> Mockito.mock(DataSource.class));
+        Session currentSession = sessionFactory.getCurrentSession();
+        Assert.assertNotNull(currentSession);
+        Assert.assertEquals(session, currentSession);
+    }
+
+    @Test
+    public void testClosingCurrentSessionAfterBindNewSession() {
+        Session session = Mockito.mock(Session.class);
+        Mockito.when(session.isOpen()).thenReturn(true);
+
+        SessionFactory.bindSession(session);
+
+        Session newSession = Mockito.mock(Session.class);
+        SessionFactory.bindSession(newSession);
+
+        Mockito.verify(session).close();
+    }
+
+    @Test
+    public void testUnbindSession() {
+        Session session = Mockito.mock(Session.class);
+        Mockito.when(session.isOpen()).thenReturn(true);
+
+        SessionFactory.bindSession(session);
+        SessionFactory.unbindSession();
+
+        Mockito.verify(session).close();
     }
 }

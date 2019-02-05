@@ -8,7 +8,6 @@ import java.sql.SQLException;
 /**
  * @author Oleg Marchenko
  */
-
 public final class JDBCUtils {
     public static final String DATABASE_NAME = "test_db";
 

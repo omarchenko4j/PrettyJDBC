@@ -15,7 +15,6 @@ import java.sql.SQLException;
 /**
  * @author Oleg Marchenko
  */
-
 public class TransactionTest {
 
     @Test
