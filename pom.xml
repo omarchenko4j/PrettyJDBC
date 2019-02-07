@@ -72,6 +72,7 @@
         <maven.plugin.source.version>3.0.1</maven.plugin.source.version>
         <maven.plugin.javadoc.version>3.0.1</maven.plugin.javadoc.version>
         <maven.plugin.gpg.version>1.6</maven.plugin.gpg.version>
+        <maven.plugin.jacoco.version>0.8.3</maven.plugin.jacoco.version>
 
         <mockito.version>2.23.4</mockito.version>
         <junit.version>4.12</junit.version>
@@ -167,6 +168,25 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${maven.plugin.jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
