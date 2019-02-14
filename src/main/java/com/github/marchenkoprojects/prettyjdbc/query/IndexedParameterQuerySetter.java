@@ -9,13 +9,13 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 /**
- * This internal interface provides methods for setting parameter values by index in a specific {@link AbstractQuery}.
+ * This internal interface provides methods for setting parameter values by index in a specific {@link Query}.
  *
  * @param <Q> type of return query to perform call chain
  *
  * @author Oleg Marchenko
  */
-interface IndexedParameterQuerySetter<Q> {
+interface IndexedParameterQuerySetter<Q extends Query> {
 
     /**
      * Sets the designated parameter by index to the given Java <code>boolean</code> value.

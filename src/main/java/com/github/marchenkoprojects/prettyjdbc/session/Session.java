@@ -2,7 +2,7 @@ package com.github.marchenkoprojects.prettyjdbc.session;
 
 import com.github.marchenkoprojects.prettyjdbc.Unwrapable;
 import com.github.marchenkoprojects.prettyjdbc.query.NamedParameterQuery;
-import com.github.marchenkoprojects.prettyjdbc.query.SimpleQuery;
+import com.github.marchenkoprojects.prettyjdbc.query.Query;
 import com.github.marchenkoprojects.prettyjdbc.query.TypedQuery;
 import com.github.marchenkoprojects.prettyjdbc.transaction.Transaction;
 import com.github.marchenkoprojects.prettyjdbc.transaction.TransactionWork;
@@ -22,20 +22,20 @@ import java.sql.Connection;
  * @author Oleg Marchenko
  *
  * @see Transaction
- * @see SimpleQuery
+ * @see Query
  * @see TypedQuery
  * @see NamedParameterQuery
  */
 public interface Session extends Unwrapable<Connection>, AutoCloseable {
 
     /**
-     * Creates a {@link SimpleQuery} object for sending SQL statements to the database.
+     * Creates a {@link Query} object for sending SQL statements to the database.
      * This object can then be used to efficiently execute this statement multiple times.
      *
      * @param sqlQuery an SQL query
      * @return a new simple <code>Query</code> object
      */
-    SimpleQuery createQuery(String sqlQuery);
+    Query createQuery(String sqlQuery);
 
     /**
      * Creates a {@link TypedQuery} object for sending SQL statements to the database.
@@ -54,12 +54,10 @@ public interface Session extends Unwrapable<Connection>, AutoCloseable {
      * <br>
      * Named parameters are defined as patterns: ":paramName" or ":{paramName}" where "paramName" is name of parameter.
      *
-     * @param <T> specific type of object to create a named parameter query
      * @param sqlQuery an SQL query
-     * @param type type of result object
      * @return a new <code>NamedParameterQuery</code> object
      */
-    <T> NamedParameterQuery<T> createNamedParameterQuery(String sqlQuery, Class<T> type);
+    NamedParameterQuery createNamedParameterQuery(String sqlQuery);
 
     /**
      * Creates a new {@link Transaction} object without starting and associates it with the current <code>Session</code>.

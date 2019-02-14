@@ -12,6 +12,22 @@ import java.util.List;
 public class NamedParameterQueryProcessorTest {
 
     @Test
+    public void testQueryWithoutNamedParameters() {
+        String query = "SELECT id, original_name, year FROM films OFFSET ? LIMIT ?";
+
+        NamedParameterQueryProcessor namedParameterQueryProcessor = new NamedParameterQueryProcessor(query);
+        namedParameterQueryProcessor.process();
+
+        String nativeQuery = namedParameterQueryProcessor.getNativeQuery();
+        Assert.assertNotNull(nativeQuery);
+        Assert.assertEquals(nativeQuery, "SELECT id, original_name, year FROM films OFFSET ? LIMIT ?");
+
+        List<String> parameters = namedParameterQueryProcessor.getParameters();
+        Assert.assertNotNull(parameters);
+        Assert.assertTrue(parameters.isEmpty());
+    }
+
+    @Test
     public void testQueryWithOneParameterInClassicStyle() {
         String query = "SELECT * FROM films WHERE id = :filmId";
 

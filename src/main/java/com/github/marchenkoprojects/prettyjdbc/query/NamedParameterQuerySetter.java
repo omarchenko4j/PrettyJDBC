@@ -15,7 +15,7 @@ import java.time.LocalTime;
  *
  * @author Oleg Marchenko
  */
-interface NamedParameterQuerySetter<Q> {
+interface NamedParameterQuerySetter<Q extends NamedParameterQuery> {
 
     /**
      * Sets the designated parameter by name to the given Java <code>boolean</code> value.

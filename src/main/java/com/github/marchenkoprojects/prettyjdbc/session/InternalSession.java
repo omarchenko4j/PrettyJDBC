@@ -1,8 +1,7 @@
 package com.github.marchenkoprojects.prettyjdbc.session;
 
-import com.github.marchenkoprojects.prettyjdbc.query.AbstractQuery;
 import com.github.marchenkoprojects.prettyjdbc.query.NamedParameterQuery;
-import com.github.marchenkoprojects.prettyjdbc.query.SimpleQuery;
+import com.github.marchenkoprojects.prettyjdbc.query.Query;
 import com.github.marchenkoprojects.prettyjdbc.query.TypedQuery;
 import com.github.marchenkoprojects.prettyjdbc.transaction.InternalTransaction;
 import com.github.marchenkoprojects.prettyjdbc.transaction.Transaction;
@@ -37,7 +36,7 @@ public class InternalSession implements Session {
     /**
      * A queue of associated queries with this session.
      */
-    private FixedSizeQueue<AbstractQuery<?>> queries;
+    private FixedSizeQueue<Query> queries;
 
     public InternalSession(Connection connection) {
         this.connection = connection;
@@ -58,8 +57,8 @@ public class InternalSession implements Session {
      * {@inheritDoc}
      */
     @Override
-    public SimpleQuery createQuery(String sqlQuery) {
-        SimpleQuery query = new SimpleQuery(getNewStatement(sqlQuery));
+    public Query createQuery(String sqlQuery) {
+        Query query = new Query(getNewStatement(sqlQuery));
         bindQuery(query);
         return query;
     }
@@ -78,14 +77,14 @@ public class InternalSession implements Session {
      * {@inheritDoc}
      */
     @Override
-    public <T> NamedParameterQuery<T> createNamedParameterQuery(String sqlQuery, Class<T> type) {
+    public NamedParameterQuery createNamedParameterQuery(String sqlQuery) {
         NamedParameterQueryProcessor queryProcessor = new NamedParameterQueryProcessor(sqlQuery);
         queryProcessor.process();
 
         String nativeQuery = queryProcessor.getNativeQuery();
         List<String> parameters = queryProcessor.getParameters();
 
-        NamedParameterQuery<T> namedParameterQuery = new NamedParameterQuery<>(getNewStatement(nativeQuery), parameters, type);
+        NamedParameterQuery namedParameterQuery = new NamedParameterQuery(getNewStatement(nativeQuery), parameters);
         bindQuery(namedParameterQuery);
         return namedParameterQuery;
     }
@@ -99,8 +98,8 @@ public class InternalSession implements Session {
         }
     }
 
-    private void bindQuery(AbstractQuery<?> query) {
-        queries.offer(query, AbstractQuery::closeQuerySoftly);
+    private void bindQuery(Query query) {
+        queries.offer(query, Query::closeQuerySoftly);
     }
 
     /**
@@ -194,7 +193,7 @@ public class InternalSession implements Session {
     }
 
     private void releaseQueries() {
-        queries.forEach(AbstractQuery::closeQuerySoftly);
+        queries.forEach(Query::closeQuerySoftly);
         queries.clear();
         queries = null;
     }

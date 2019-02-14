@@ -2,7 +2,7 @@ package com.github.marchenkoprojects.prettyjdbc;
 
 import com.github.marchenkoprojects.prettyjdbc.model.Film;
 import com.github.marchenkoprojects.prettyjdbc.query.NamedParameterQuery;
-import com.github.marchenkoprojects.prettyjdbc.query.SimpleQuery;
+import com.github.marchenkoprojects.prettyjdbc.query.Query;
 import com.github.marchenkoprojects.prettyjdbc.query.TypedQuery;
 import com.github.marchenkoprojects.prettyjdbc.session.InternalSession;
 import com.github.marchenkoprojects.prettyjdbc.session.Session;
@@ -33,8 +33,7 @@ public class SessionTest {
     public void testCreateQuery() {
         Session session = SessionFactory.newSession(JDBCUtils.getConnection());
 
-        SimpleQuery query = session
-                .createQuery("SELECT id, original_name, year FROM films WHERE id = ?");
+        Query query = session.createQuery("SELECT id, original_name, year FROM films WHERE id = ?");
         Assert.assertNotNull(query);
         Assert.assertTrue(query.isActive());
 
@@ -57,8 +56,8 @@ public class SessionTest {
     public void testCreateNamedParameterQuery() {
         Session session = SessionFactory.newSession(JDBCUtils.getConnection());
 
-        NamedParameterQuery<Film> namedParameterQuery = session
-                .createNamedParameterQuery("SELECT id, original_name, year FROM films WHERE id = ?", Film.class);
+        NamedParameterQuery namedParameterQuery = session
+                .createNamedParameterQuery("SELECT id, original_name, year FROM films WHERE id = ?");
         Assert.assertNotNull(namedParameterQuery);
         Assert.assertTrue(namedParameterQuery.isActive());
 
@@ -72,7 +71,7 @@ public class SessionTest {
         Session session = new InternalSession(connection);
         Assert.assertTrue(session.isOpen());
 
-        SimpleQuery query = session
+        Query query = session
                 .createQuery("INSERT INTO films VALUES (?, ?, ?)");
         PreparedStatement queryStatement = query.unwrap();
         Assert.assertTrue(query.isActive());
@@ -84,8 +83,8 @@ public class SessionTest {
         Assert.assertTrue(typedQuery.isActive());
         Assert.assertFalse(typedQueryStatement.isClosed());
 
-        NamedParameterQuery<Film> namedParameterQuery = session
-                .createNamedParameterQuery("SELECT * FROM films OFFSET :offset LIMIT :limit", Film.class);
+        NamedParameterQuery namedParameterQuery = session
+                .createNamedParameterQuery("SELECT * FROM films OFFSET :offset LIMIT :limit");
         PreparedStatement namedParameterQueryStatement = namedParameterQuery.unwrap();
         Assert.assertTrue(namedParameterQuery.isActive());
         Assert.assertFalse(namedParameterQueryStatement.isClosed());

@@ -1,6 +1,6 @@
 package com.github.marchenkoprojects.prettyjdbc;
 
-import com.github.marchenkoprojects.prettyjdbc.query.SimpleQuery;
+import com.github.marchenkoprojects.prettyjdbc.query.Query;
 import com.github.marchenkoprojects.prettyjdbc.query.scrollable_result.ReadOnlyScrollableResult;
 import com.github.marchenkoprojects.prettyjdbc.util.DatabaseInitializer;
 import com.github.marchenkoprojects.prettyjdbc.util.JDBCUtils;
@@ -20,7 +20,7 @@ import java.time.LocalTime;
 /**
  * @author Oleg Marchenko
  */
-public class SimpleQueryTest {
+public class QueryTest {
 
     @BeforeClass
     public static void beforeTests() {
@@ -33,7 +33,7 @@ public class SimpleQueryTest {
             try(PreparedStatement preparedStatement = connection.prepareStatement(
                     "SELECT id, original_name, year FROM films WHERE id = ?")) {
 
-                SimpleQuery simpleQuery = new SimpleQuery(preparedStatement);
+                Query simpleQuery = new Query(preparedStatement);
                 Assert.assertTrue(simpleQuery.isActive());
 
                 ReadOnlyScrollableResult scrollableResult = simpleQuery
@@ -58,7 +58,7 @@ public class SimpleQueryTest {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT INTO films VALUES (?, ?, ?)")) {
 
-                SimpleQuery simpleQuery = new SimpleQuery(preparedStatement);
+                Query simpleQuery = new Query(preparedStatement);
                 Assert.assertTrue(simpleQuery.isActive());
 
                 simpleQuery
@@ -87,7 +87,7 @@ public class SimpleQueryTest {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT INTO films VALUES (?, ?, ?)")) {
 
-                SimpleQuery simpleQuery = new SimpleQuery(preparedStatement);
+                Query simpleQuery = new Query(preparedStatement);
                 simpleQuery
                         .setParameter(1, 5)
                         .setParameter(2, "The Hobbit: The Desolation of Smaug")
@@ -123,7 +123,7 @@ public class SimpleQueryTest {
     public void testSettingBooleanTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(Mockito.anyInt(), Mockito.anyBoolean());
 
         Mockito.verify(preparedStatement).setBoolean(Mockito.anyInt(), Mockito.anyBoolean());
@@ -133,7 +133,7 @@ public class SimpleQueryTest {
     public void testSettingByteTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(Mockito.anyInt(), Mockito.anyByte());
 
         Mockito.verify(preparedStatement).setByte(Mockito.anyInt(), Mockito.anyByte());
@@ -143,7 +143,7 @@ public class SimpleQueryTest {
     public void testSettingShortTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(Mockito.anyInt(), Mockito.anyShort());
 
         Mockito.verify(preparedStatement).setShort(Mockito.anyInt(), Mockito.anyShort());
@@ -153,7 +153,7 @@ public class SimpleQueryTest {
     public void testSettingIntegerTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(Mockito.anyInt(), Mockito.anyInt());
 
         Mockito.verify(preparedStatement).setInt(Mockito.anyInt(), Mockito.anyInt());
@@ -163,7 +163,7 @@ public class SimpleQueryTest {
     public void testSettingLongTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(Mockito.anyInt(), Mockito.anyLong());
 
         Mockito.verify(preparedStatement).setLong(Mockito.anyInt(), Mockito.anyLong());
@@ -173,7 +173,7 @@ public class SimpleQueryTest {
     public void testSettingFloatTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(Mockito.anyInt(), Mockito.anyFloat());
 
         Mockito.verify(preparedStatement).setFloat(Mockito.anyInt(), Mockito.anyFloat());
@@ -183,7 +183,7 @@ public class SimpleQueryTest {
     public void testSettingDoubleTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(Mockito.anyInt(), Mockito.anyDouble());
 
         Mockito.verify(preparedStatement).setDouble(Mockito.anyInt(), Mockito.anyDouble());
@@ -193,7 +193,7 @@ public class SimpleQueryTest {
     public void testSettingBigDecimalTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(1, BigDecimal.valueOf(0));
 
         Mockito.verify(preparedStatement).setBigDecimal(ArgumentMatchers.anyInt(), ArgumentMatchers.any(BigDecimal.class));
@@ -203,7 +203,7 @@ public class SimpleQueryTest {
     public void testSettingStringTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(Mockito.anyInt(), Mockito.anyString());
 
         Mockito.verify(preparedStatement).setString(Mockito.anyInt(), Mockito.anyString());
@@ -213,7 +213,7 @@ public class SimpleQueryTest {
     public void testSettingByteArrayTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(1, new byte[0]);
 
         Mockito.verify(preparedStatement).setBytes(ArgumentMatchers.anyInt(), ArgumentMatchers.any(byte[].class));
@@ -223,7 +223,7 @@ public class SimpleQueryTest {
     public void testSettingDateTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(1, Date.valueOf(LocalDate.now()));
 
         Mockito.verify(preparedStatement).setDate(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Date.class));
@@ -233,7 +233,7 @@ public class SimpleQueryTest {
     public void testSettingLocalDateTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(1, LocalDate.now());
 
         Mockito.verify(preparedStatement).setDate(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Date.class));
@@ -243,7 +243,7 @@ public class SimpleQueryTest {
     public void testSettingTimeTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(1, Time.valueOf(LocalTime.now()));
 
         Mockito.verify(preparedStatement).setTime(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Time.class));
@@ -253,7 +253,7 @@ public class SimpleQueryTest {
     public void testSettingLocalTimeTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(1, LocalTime.now());
 
         Mockito.verify(preparedStatement).setTime(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Time.class));
@@ -263,7 +263,7 @@ public class SimpleQueryTest {
     public void testSettingTimestampTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(1, Timestamp.valueOf(LocalDateTime.now()));
 
         Mockito.verify(preparedStatement).setTimestamp(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Timestamp.class));
@@ -273,7 +273,7 @@ public class SimpleQueryTest {
     public void testSettingLocalDateTimeTypeParameterByIndex() throws SQLException {
         PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
 
-        SimpleQuery query = new SimpleQuery(preparedStatement);
+        Query query = new Query(preparedStatement);
         query.setParameter(1, LocalDateTime.now());
 
         Mockito.verify(preparedStatement).setTimestamp(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Timestamp.class));
