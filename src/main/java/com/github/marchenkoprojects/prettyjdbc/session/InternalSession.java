@@ -12,13 +12,11 @@ import com.github.marchenkoprojects.prettyjdbc.util.NamedParameterQueryProcessor
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.AbstractQueue;
-import java.util.ArrayDeque;
-import java.util.Iterator;
-import java.util.Queue;
-import java.util.function.Consumer;
 
+import static com.github.marchenkoprojects.prettyjdbc.query.Query.closeQuerySoftly;
+import static com.github.marchenkoprojects.prettyjdbc.query.Query.isActiveQuery;
 import static com.github.marchenkoprojects.prettyjdbc.transaction.InternalTransaction.isActiveTransaction;
+import static com.github.marchenkoprojects.prettyjdbc.transaction.InternalTransaction.stopTransactionSoftly;
 
 /**
  * This is the main internal implementation of the {@link Session} interface.
@@ -28,7 +26,6 @@ import static com.github.marchenkoprojects.prettyjdbc.transaction.InternalTransa
  * @see Session
  */
 public class InternalSession implements Session {
-    private static final int MAX_NUMBER_OF_ASSOCIATED_QUERIES = 16;
 
     private final Connection connection;
 
@@ -37,13 +34,12 @@ public class InternalSession implements Session {
      */
     private Transaction transaction;
     /**
-     * A queue of associated queries with this session.
+     * Associated query with this session.
      */
-    private FixedSizeQueue<Query> queries;
+    private Query query;
 
     public InternalSession(Connection connection) {
         this.connection = connection;
-        this.queries = new FixedSizeQueue<>(MAX_NUMBER_OF_ASSOCIATED_QUERIES);
     }
 
     /**
@@ -61,6 +57,10 @@ public class InternalSession implements Session {
      */
     @Override
     public Query createNativeQuery(String sql) {
+        if (isActiveQuery(query)) {
+            throw new IllegalStateException("Current session already contains the active query");
+        }
+
         PreparedStatement preparedStatement = createStatement(sql);
         Query query = new Query(preparedStatement);
         bindQuery(query);
@@ -72,6 +72,10 @@ public class InternalSession implements Session {
      */
     @Override
     public <T> TypedQuery<T> createNativeQuery(String sql, Class<T> resultType) {
+        if (isActiveQuery(query)) {
+            throw new IllegalStateException("Current session already contains the active query");
+        }
+
         PreparedStatement preparedStatement = createStatement(sql);
         TypedQuery<T> query = new TypedQuery<>(preparedStatement, resultType);
         bindQuery(query);
@@ -83,6 +87,10 @@ public class InternalSession implements Session {
      */
     @Override
     public NamedParameterQuery createQuery(String sql) {
+        if (isActiveQuery(query)) {
+            throw new IllegalStateException("Current session already contains the active query");
+        }
+
         NamedParameterQueryProcessor queryProcessor = new NamedParameterQueryProcessor(sql);
         queryProcessor.process();
 
@@ -97,6 +105,10 @@ public class InternalSession implements Session {
      */
     @Override
     public <T> TypedQuery<T> createQuery(String sql, Class<T> resultType) {
+        if (isActiveQuery(query)) {
+            throw new IllegalStateException("Current session already contains the active query");
+        }
+
         NamedParameterQueryProcessor queryProcessor = new NamedParameterQueryProcessor(sql);
         queryProcessor.process();
 
@@ -116,7 +128,7 @@ public class InternalSession implements Session {
     }
 
     private void bindQuery(Query query) {
-        queries.offer(query, Query::closeQuerySoftly);
+        this.query = query;
     }
 
     /**
@@ -126,7 +138,8 @@ public class InternalSession implements Session {
     public Transaction newTransaction() {
         if (isActiveTransaction(transaction)) stopTransaction();
 
-        transaction = createTransaction();
+        Transaction transaction = createTransaction();
+        bindTransaction(transaction);
         return transaction;
     }
 
@@ -137,13 +150,18 @@ public class InternalSession implements Session {
     public Transaction beginTransaction() {
         if (isActiveTransaction(transaction)) return transaction;
 
-        transaction = createTransaction();
+        Transaction transaction = createTransaction();
         transaction.begin();
+        bindTransaction(transaction);
         return transaction;
     }
 
     private Transaction createTransaction() {
         return new InternalTransaction(connection);
+    }
+
+    private void bindTransaction(Transaction transaction) {
+        this.transaction = transaction;
     }
 
     /**
@@ -204,19 +222,18 @@ public class InternalSession implements Session {
      */
     @Override
     public void close() {
-        releaseQueries();
+        releaseQuery();
         stopTransaction();
         closeInternal();
     }
 
-    private void releaseQueries() {
-        queries.forEach(Query::closeQuerySoftly);
-        queries.clear();
-        queries = null;
+    private void releaseQuery() {
+        closeQuerySoftly(query);
+        query = null;
     }
 
     private void stopTransaction() {
-        InternalTransaction.stopTransactionSoftly(transaction);
+        stopTransactionSoftly(transaction);
         transaction = null;
     }
 
@@ -226,91 +243,6 @@ public class InternalSession implements Session {
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * A non-blocking queue which automatically evicts elements from the head of the queue when attempting to add new elements onto the queue and it is full.
-     * This queue orders elements FIFO (first-in-first-out).
-     * <br>
-     * An fixed size queue must be configured with a maximum size.
-     * Each time an element is added to a full queue, the queue automatically removes its head element.
-     * This is different from conventional bounded queues, which either block or reject new elements when full.
-     *
-     * @author Oleg Marchenko
-     *
-     * @see Queue
-     */
-    private static class FixedSizeQueue<E> extends AbstractQueue<E> {
-
-        private final Queue<E> queue;
-        private final int maxSize;
-
-        public FixedSizeQueue(int maxSize) {
-            this.queue = new ArrayDeque<>(maxSize + 1);
-            this.maxSize = maxSize;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Iterator<E> iterator() {
-            return queue.iterator();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int size() {
-            return queue.size();
-        }
-
-        /**
-         * Inserts the specified element immediately into this queue and
-         * if the maximum size is reached then retrieves and removes the head element.
-         *
-         * @param e the element to add
-         * @return <code>true</code> if the element was added to this queue, else
-         *         <code>false</code>
-         */
-        @Override
-        public boolean offer(E e) {
-            queue.offer(e);
-            if (size() >= maxSize) poll();
-            return true;
-        }
-
-        /**
-         * Inserts the specified element immediately into this queue.
-         * If the maximum size is reached then retrieves and removes the head element and accept to consumer.
-         *
-         * @param e the element to add
-         * @param consumer a consumer which accepts a remove element
-         * @return <code>true</code> if the element was added to this queue, else
-         *         <code>false</code>
-         */
-        public boolean offer(E e, Consumer<E> consumer) {
-            queue.offer(e);
-            if (size() >= maxSize) consumer.accept(poll());
-            return true;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public E poll() {
-            return queue.poll();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public E peek() {
-            return queue.peek();
         }
     }
 }

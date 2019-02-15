@@ -376,6 +376,17 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
     }
 
     /**
+     * Returns <code>true</code> if the query is still active.
+     *
+     * @param query query to check activity
+     * @return <code>true</code> if the query is still active;
+     *         <code>false</code> otherwise
+     */
+    public static boolean isActiveQuery(Query query) {
+        return query != null && query.isActive();
+    }
+
+    /**
      * Allows to immediately close the query, protecting against possible exceptions.
      *
      * @param query the query to close
