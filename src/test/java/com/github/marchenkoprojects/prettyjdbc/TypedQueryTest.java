@@ -23,22 +23,22 @@ public class TypedQueryTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testQueryExecutionWithoutResultMapper() {
+    public void testTypedQueryExecutionWithoutResultMapper() {
         Connection connection = JDBCUtils.getConnection();
         try(Session session = SessionFactory.newSession(connection)) {
-            Film film = session
-                    .createTypedQuery("SELECT id, original_name, year FROM films WHERE id = ?", Film.class)
+            session
+                    .createNativeQuery("SELECT id, original_name, year FROM films WHERE id = ?", Film.class)
                     .setParameter(1, 1)
                     .unique();
         }
     }
 
     @Test
-    public void testQueryExecutionWithUniqueResult() {
+    public void testTypedQueryExecutionWithUniqueResult() {
         Connection connection = JDBCUtils.getConnection();
         try(Session session = SessionFactory.newSession(connection)) {
             Film film = session
-                    .createTypedQuery("SELECT id, original_name, year FROM films WHERE id = ?", Film.class)
+                    .createNativeQuery("SELECT id, original_name, year FROM films WHERE id = ?", Film.class)
                     .setParameter(1, 1)
                     .setResultMapper(resultSet -> {
                         Film newFilm = new Film();
@@ -60,7 +60,7 @@ public class TypedQueryTest {
         Connection connection = JDBCUtils.getConnection();
         try(Session session = SessionFactory.newSession(connection)) {
             List<Film> films = session
-                    .createTypedQuery("SELECT id, original_name, year FROM films", Film.class)
+                    .createNativeQuery("SELECT id, original_name, year FROM films", Film.class)
                     .setResultMapper(resultSet -> {
                         Film newFilm = new Film();
                         newFilm.setId(resultSet.getInt("id"));

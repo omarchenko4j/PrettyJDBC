@@ -30,38 +30,43 @@ public class SessionTest {
     }
 
     @Test
-    public void testCreateQuery() {
-        Session session = SessionFactory.newSession(JDBCUtils.getConnection());
+    public void testCreateNativeQuery() {
+        Connection connection = JDBCUtils.getConnection();
+        try(Session session = SessionFactory.newSession(connection)) {
+            Query query = session.createNativeQuery("SELECT * FROM films WHERE id = ?");
+            Assert.assertNotNull(query);
+            Assert.assertTrue(query.isActive());
+        }
+    }
 
-        Query query = session.createQuery("SELECT id, original_name, year FROM films WHERE id = ?");
-        Assert.assertNotNull(query);
-        Assert.assertTrue(query.isActive());
-
-        session.close();
+    @Test(expected = RuntimeException.class)
+    public void testCreateNativeQueryWithSyntaxErrors() {
+        Connection connection = JDBCUtils.getConnection();
+        try(Session session = SessionFactory.newSession(connection)) {
+            session.createNativeQuery("SELECT * FROM films\" WHERE id = ?");
+        }
     }
 
     @Test
-    public void testCreateTypedQuery() {
-        Session session = SessionFactory.newSession(JDBCUtils.getConnection());
-
-        TypedQuery<Film> typedQuery = session
-                .createTypedQuery("SELECT id, original_name, year FROM films WHERE id = ?", Film.class);
-        Assert.assertNotNull(typedQuery);
-        Assert.assertTrue(typedQuery.isActive());
-
-        session.close();
+    public void testCreateNativeQueryWithTypedResultRetrieval() {
+        Connection connection = JDBCUtils.getConnection();
+        try(Session session = SessionFactory.newSession(connection)) {
+            TypedQuery<Film> query = session
+                    .createNativeQuery("SELECT id, original_name, year FROM films WHERE id = ?", Film.class);
+            Assert.assertNotNull(query);
+            Assert.assertTrue(query.isActive());
+        }
     }
 
     @Test
-    public void testCreateNamedParameterQuery() {
-        Session session = SessionFactory.newSession(JDBCUtils.getConnection());
-
-        NamedParameterQuery namedParameterQuery = session
-                .createNamedParameterQuery("SELECT id, original_name, year FROM films WHERE id = ?");
-        Assert.assertNotNull(namedParameterQuery);
-        Assert.assertTrue(namedParameterQuery.isActive());
-
-        session.close();
+    public void testCreateQueryWithNamedParameters() {
+        Connection connection = JDBCUtils.getConnection();
+        try(Session session = SessionFactory.newSession(connection)) {
+            NamedParameterQuery query =
+                    session.createQuery("SELECT id, original_name, year FROM films WHERE id = :filmId");
+            Assert.assertNotNull(query);
+            Assert.assertTrue(query.isActive());
+        }
     }
 
     @Test
@@ -78,13 +83,13 @@ public class SessionTest {
         Assert.assertFalse(queryStatement.isClosed());
 
         TypedQuery<Film> typedQuery = session
-                .createTypedQuery("SELECT id, original_name, year FROM films WHERE id = ?", Film.class);
+                .createQuery("SELECT id, original_name, year FROM films WHERE id = ?", Film.class);
         PreparedStatement typedQueryStatement = typedQuery.unwrap();
         Assert.assertTrue(typedQuery.isActive());
         Assert.assertFalse(typedQueryStatement.isClosed());
 
         NamedParameterQuery namedParameterQuery = session
-                .createNamedParameterQuery("SELECT * FROM films OFFSET :offset LIMIT :limit");
+                .createQuery("SELECT * FROM films OFFSET :offset LIMIT :limit");
         PreparedStatement namedParameterQueryStatement = namedParameterQuery.unwrap();
         Assert.assertTrue(namedParameterQuery.isActive());
         Assert.assertFalse(namedParameterQueryStatement.isClosed());

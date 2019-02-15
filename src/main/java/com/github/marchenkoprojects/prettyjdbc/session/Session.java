@@ -21,43 +21,62 @@ import java.sql.Connection;
  *
  * @author Oleg Marchenko
  *
- * @see Transaction
  * @see Query
- * @see TypedQuery
  * @see NamedParameterQuery
+ * @see TypedQuery
+ * @see Transaction
  */
 public interface Session extends Unwrapable<Connection>, AutoCloseable {
 
     /**
-     * Creates a {@link Query} object for sending SQL statements to the database.
-     * This object can then be used to efficiently execute this statement multiple times.
-     *
-     * @param sqlQuery an SQL query
-     * @return a new simple <code>Query</code> object
-     */
-    Query createQuery(String sqlQuery);
-
-    /**
-     * Creates a {@link TypedQuery} object for sending SQL statements to the database.
-     * This object can then be used to efficiently execute this statement multiple times.
-     *
-     * @param <T> specific type of object to create a typed query
-     * @param sqlQuery an SQL query
-     * @param type type of result object
-     * @return a new <code>TypedQuery</code> object
-     */
-    <T> TypedQuery<T> createTypedQuery(String sqlQuery, Class<T> type);
-
-    /**
-     * Creates a {@link NamedParameterQuery} object with named parameters for sending SQL statements to the database.
-     * This object can then be used to efficiently execute this statement multiple times.
+     * Creates a new native query object to send SQL expressions to the database.
+     * Native query represents a parameterized SQL query whose parameters are specified as '?' character.
      * <br>
-     * Named parameters are defined as patterns: ":paramName" or ":{paramName}" where "paramName" is name of parameter.
+     * <b>Note:</b> This SQL query can be reused and executed multiple times.
      *
-     * @param sqlQuery an SQL query
-     * @return a new <code>NamedParameterQuery</code> object
+     * @param sql an SQL expression without or with parameters like '?'
+     * @return a new native query object
+     * @see Query
      */
-    NamedParameterQuery createNamedParameterQuery(String sqlQuery);
+    Query createNativeQuery(String sql);
+
+    /**
+     * Creates a new native query object to send SQL expressions to the database with typed result retrieval.
+     * Native query represents a parameterized SQL query whose parameters are specified as '?' character.
+     * <br>
+     * <b>Note:</b> This SQL query can be reused and executed multiple times.
+     *
+     * @param sql an SQL expression without or with parameters like '?'
+     * @param resultType type of result object
+     * @return a new native query object
+     * @see TypedQuery
+     */
+    <T> TypedQuery<T> createNativeQuery(String sql, Class<T> resultType);
+
+    /**
+     * Creates a new query object with named parameters to send SQL expressions to the database.
+     * Named parameters are defined as patterns: <b>:paramName</b> or <b>:{paramName}</b> where <tt>paramName</tt> is name of parameter.
+     * <br>
+     * <b>Note:</b> This SQL query can be reused and executed multiple times.
+     *
+     * @param sql an SQL expression with named parameters
+     * @return a new query object
+     * @see NamedParameterQuery
+     */
+    NamedParameterQuery createQuery(String sql);
+
+    /**
+     * Creates a new query object with named parameters to send SQL expressions to the database with typed result retrieval.
+     * Named parameters are defined as patterns: <b>:paramName</b> or <b>:{paramName}</b> where <tt>paramName</tt> is name of parameter.
+     * <br>
+     * <b>Note:</b> This SQL query can be reused and executed multiple times.
+     *
+     * @param sql an SQL expression with named parameters
+     * @param resultType type of result object
+     * @return a new query object
+     * @see TypedQuery
+     */
+    <T> TypedQuery<T> createQuery(String sql, Class<T> resultType);
 
     /**
      * Creates a new {@link Transaction} object without starting and associates it with the current <code>Session</code>.

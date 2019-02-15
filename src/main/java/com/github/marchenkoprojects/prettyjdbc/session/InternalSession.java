@@ -12,7 +12,10 @@ import com.github.marchenkoprojects.prettyjdbc.util.NamedParameterQueryProcessor
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.AbstractQueue;
+import java.util.ArrayDeque;
+import java.util.Iterator;
+import java.util.Queue;
 import java.util.function.Consumer;
 
 import static com.github.marchenkoprojects.prettyjdbc.transaction.InternalTransaction.isActiveTransaction;
@@ -57,8 +60,9 @@ public class InternalSession implements Session {
      * {@inheritDoc}
      */
     @Override
-    public Query createQuery(String sqlQuery) {
-        Query query = new Query(getNewStatement(sqlQuery));
+    public Query createNativeQuery(String sql) {
+        PreparedStatement preparedStatement = createStatement(sql);
+        Query query = new Query(preparedStatement);
         bindQuery(query);
         return query;
     }
@@ -67,31 +71,44 @@ public class InternalSession implements Session {
      * {@inheritDoc}
      */
     @Override
-    public <T> TypedQuery<T> createTypedQuery(String sqlQuery, Class<T> resultType) {
-        TypedQuery<T> typedQuery = new TypedQuery<>(getNewStatement(sqlQuery), resultType);
-        bindQuery(typedQuery);
-        return typedQuery;
+    public <T> TypedQuery<T> createNativeQuery(String sql, Class<T> resultType) {
+        PreparedStatement preparedStatement = createStatement(sql);
+        TypedQuery<T> query = new TypedQuery<>(preparedStatement, resultType);
+        bindQuery(query);
+        return query;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NamedParameterQuery createNamedParameterQuery(String sqlQuery) {
-        NamedParameterQueryProcessor queryProcessor = new NamedParameterQueryProcessor(sqlQuery);
+    public NamedParameterQuery createQuery(String sql) {
+        NamedParameterQueryProcessor queryProcessor = new NamedParameterQueryProcessor(sql);
         queryProcessor.process();
 
-        String nativeQuery = queryProcessor.getNativeQuery();
-        List<String> parameters = queryProcessor.getParameters();
-
-        NamedParameterQuery namedParameterQuery = new NamedParameterQuery(getNewStatement(nativeQuery), parameters);
-        bindQuery(namedParameterQuery);
-        return namedParameterQuery;
+        PreparedStatement preparedStatement = createStatement(queryProcessor.getNativeQuery());
+        NamedParameterQuery query = new NamedParameterQuery(preparedStatement, queryProcessor.getParameters());
+        bindQuery(query);
+        return query;
     }
 
-    private PreparedStatement getNewStatement(String sqlQuery) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> TypedQuery<T> createQuery(String sql, Class<T> resultType) {
+        NamedParameterQueryProcessor queryProcessor = new NamedParameterQueryProcessor(sql);
+        queryProcessor.process();
+
+        PreparedStatement preparedStatement = createStatement(queryProcessor.getNativeQuery());
+        TypedQuery<T> query = new TypedQuery<>(preparedStatement, queryProcessor.getParameters(), resultType);
+        bindQuery(query);
+        return query;
+    }
+
+    private PreparedStatement createStatement(String sql) {
         try {
-            return connection.prepareStatement(sqlQuery);
+            return connection.prepareStatement(sql);
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
