@@ -2,9 +2,6 @@ package com.github.marchenkoprojects.prettyjdbc.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * This class processes a SQL query with named parameters to retrieve its native form and all named parameters.
@@ -12,8 +9,10 @@ import java.util.stream.Stream;
  * @author Oleg Marchenko
  */
 public class NamedParameterQueryProcessor {
-    private static final Set<Character> PARAMETER_SEPARATORS = getParameterSeparators();
-    private static final String SQL_PARAMETER = "?";
+    private static final char[] PARAMETER_SEPARATORS = {
+            '"', '\'', ':', '&', ',', ';', '(', ')', '|', '=', '+', '-', '*', '%', '/', '\\', '<', '>', '^'
+    };
+    private static final String NATIVE_SQL_PARAMETER = "?";
 
     private final String query;
     private final StringBuilder nativeQuery;
@@ -27,8 +26,6 @@ public class NamedParameterQueryProcessor {
 
     /**
      * Performs query processing with named parameters.
-     * <br>
-     * <b>Note:</b> This method must be executed after creating the processor.
      */
     public void process() {
         doProcess();
@@ -74,11 +71,11 @@ public class NamedParameterQueryProcessor {
                         continue;
                     }
 
-                    // :(x) style parameter.
+                    // :{x} style parameter.
                     if (n == '{') {
-                        while (j < length && !(chars[j] == '}')) {
+                        while (j < length && chars[j] != '}') {
                             j++;
-                            if (':' == chars[j] || '{' == chars[j]) {
+                            if (j < length && (chars[j] == ':' || chars[j] == '{')) {
                                 throw new IllegalStateException("Named parameter contains invalid character '" +
                                         chars[j] + "' at position " + i + " in statement: " + query);
                             }
@@ -90,7 +87,7 @@ public class NamedParameterQueryProcessor {
                         }
 
                         if (j - i > 3) {
-                            nativeQuery.replace(i - offset, j - offset + 1, SQL_PARAMETER);
+                            nativeQuery.replace(i - offset, j - offset + 1, NATIVE_SQL_PARAMETER);
                             parameters.add(query.substring(i + 2, j));
 
                             offset += j - i;
@@ -101,10 +98,14 @@ public class NamedParameterQueryProcessor {
                     else {
                         while (j < length && !isParameterSeparator(chars[j])) {
                             j++;
+                            if (j < length && (chars[j] == ':' || chars[j] == '}')) {
+                                throw new IllegalStateException("Named parameter contains invalid character '" +
+                                        chars[j] + "' at position " + i + " in statement: " + query);
+                            }
                         }
 
                         if (j - i > 1) {
-                            nativeQuery.replace(i - offset, j - offset, SQL_PARAMETER);
+                            nativeQuery.replace(i - offset, j - offset, NATIVE_SQL_PARAMETER);
                             parameters.add(query.substring(i + 1, j));
 
                             offset += j - i - 1;
@@ -120,11 +121,11 @@ public class NamedParameterQueryProcessor {
     }
 
     private static boolean isParameterSeparator(char c) {
-        return Character.isWhitespace(c) || PARAMETER_SEPARATORS.contains(c);
-    }
+        if (Character.isWhitespace(c)) return true;
 
-    private static Set<Character> getParameterSeparators() {
-        return Stream.of('"', '\'', ':', '&', ',', ';', '(', ')', '|', '=', '+', '-', '*', '%', '/', '\\', '<', '>', '^')
-                .collect(Collectors.toSet());
+        for (char parameterSeparator: PARAMETER_SEPARATORS) {
+            if (c == parameterSeparator) return true;
+        }
+        return false;
     }
 }

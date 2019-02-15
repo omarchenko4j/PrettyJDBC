@@ -1,8 +1,8 @@
 package com.github.marchenkoprojects.prettyjdbc;
 
+import com.github.marchenkoprojects.prettyjdbc.util.NamedParameterQueryProcessor;
 import org.junit.Assert;
 import org.junit.Test;
-import com.github.marchenkoprojects.prettyjdbc.util.NamedParameterQueryProcessor;
 
 import java.util.List;
 
@@ -12,7 +12,23 @@ import java.util.List;
 public class NamedParameterQueryProcessorTest {
 
     @Test
-    public void testQueryWithoutNamedParameters() {
+    public void testProcessQueryWithoutParameters() {
+        String query = "SELECT * FROM films";
+
+        NamedParameterQueryProcessor namedParameterQueryProcessor = new NamedParameterQueryProcessor(query);
+        namedParameterQueryProcessor.process();
+
+        String nativeQuery = namedParameterQueryProcessor.getNativeQuery();
+        Assert.assertNotNull(nativeQuery);
+        Assert.assertEquals(nativeQuery, "SELECT * FROM films");
+
+        List<String> parameters = namedParameterQueryProcessor.getParameters();
+        Assert.assertNotNull(parameters);
+        Assert.assertTrue(parameters.isEmpty());
+    }
+
+    @Test
+    public void testProcessNativeQuery() {
         String query = "SELECT id, original_name, year FROM films OFFSET ? LIMIT ?";
 
         NamedParameterQueryProcessor namedParameterQueryProcessor = new NamedParameterQueryProcessor(query);
@@ -28,7 +44,7 @@ public class NamedParameterQueryProcessorTest {
     }
 
     @Test
-    public void testQueryWithOneParameterInClassicStyle() {
+    public void testProcessQueryWithOneParameterInClassicStyle() {
         String query = "SELECT * FROM films WHERE id = :filmId";
 
         NamedParameterQueryProcessor namedParameterQueryProcessor = new NamedParameterQueryProcessor(query);
@@ -45,7 +61,7 @@ public class NamedParameterQueryProcessorTest {
     }
 
     @Test
-    public void testQueryWithManyParametersInClassicStyle() {
+    public void testProcessQueryWithManyParametersInClassicStyle() {
         String query = "SELECT * FROM films WHERE year >= :year ORDER BY year DESC OFFSET :offset LIMIT :limit";
 
         NamedParameterQueryProcessor namedParameterQueryProcessor = new NamedParameterQueryProcessor(query);
@@ -64,7 +80,7 @@ public class NamedParameterQueryProcessorTest {
     }
 
     @Test
-    public void testQueryWithOneParameterInAlternativeStyle() {
+    public void testProcessQueryWithOneParameterInAlternativeStyle() {
         String query = "SELECT id, original_name, year FROM films WHERE id = :{id}";
 
         NamedParameterQueryProcessor namedParameterQueryProcessor = new NamedParameterQueryProcessor(query);
@@ -81,7 +97,7 @@ public class NamedParameterQueryProcessorTest {
     }
 
     @Test
-    public void testQueryWithManyParametersInAlternativeStyle() {
+    public void testProcessQueryWithManyParametersInAlternativeStyle() {
         String query = "SELECT * FROM films WHERE year >= :{year} ORDER BY year DESC OFFSET :{offset} LIMIT :{limit}";
 
         NamedParameterQueryProcessor namedParameterQueryProcessor = new NamedParameterQueryProcessor(query);
@@ -99,8 +115,32 @@ public class NamedParameterQueryProcessorTest {
         Assert.assertEquals(parameters.get(2), "limit");
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testProcessQueryWithParametersInAlternativeStyleAndWithoutFirstBracket() {
+        String query = "SELECT * FROM films WHERE year >= :year}";
+
+        NamedParameterQueryProcessor namedParameterQueryProcessor = new NamedParameterQueryProcessor(query);
+        namedParameterQueryProcessor.process();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testProcessQueryWithParametersInAlternativeStyleAndWithoutLastBracket() {
+        String query = "SELECT * FROM films WHERE year >= :{year";
+
+        NamedParameterQueryProcessor namedParameterQueryProcessor = new NamedParameterQueryProcessor(query);
+        namedParameterQueryProcessor.process();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testProcessQueryWithParametersInAdditionalStyleAndDoubleBrackets() {
+        String query = "SELECT * FROM films WHERE year >= :{{year}}";
+
+        NamedParameterQueryProcessor namedParameterQueryProcessor = new NamedParameterQueryProcessor(query);
+        namedParameterQueryProcessor.process();
+    }
+
     @Test
-    public void testQueryWithOneParameterAndPostgresCast() {
+    public void testProcessQueryWithPostgresCast() {
         String query = "SELECT id, year::INTEGER, world_premiere::DATE FROM films WHERE id = :filmId";
 
         NamedParameterQueryProcessor namedParameterQueryProcessor = new NamedParameterQueryProcessor(query);
