@@ -279,6 +279,16 @@ public class QueryTest {
         Mockito.verify(preparedStatement).setTimestamp(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Timestamp.class));
     }
 
+    @Test
+    public void testSettingObjectTypeParameterByIndex() throws SQLException {
+        PreparedStatement preparedStatement = Mockito.mock(PreparedStatement.class);
+
+        Query query = new Query(preparedStatement);
+        query.setParameter(1, new Object());
+
+        Mockito.verify(preparedStatement).setObject(ArgumentMatchers.anyInt(), ArgumentMatchers.any(Object.class));
+    }
+
     @AfterClass
     public static void afterTests() {
         DatabaseInitializer.destroyDatabase();

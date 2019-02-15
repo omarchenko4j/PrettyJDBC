@@ -18,7 +18,7 @@ import java.sql.SQLException;
 public class TransactionTest {
 
     @Test
-    public void testBegin() throws SQLException {
+    public void testBeginTransaction() throws SQLException {
         try(Connection connection = JDBCUtils.getConnection()) {
             Assert.assertTrue(connection.getAutoCommit());
 
@@ -33,7 +33,7 @@ public class TransactionTest {
     }
 
     @Test
-    public void testCommit() throws SQLException {
+    public void testCommitTransaction() throws SQLException {
         try(Connection connection = JDBCUtils.getConnection()) {
             Assert.assertTrue(connection.getAutoCommit());
 
@@ -49,7 +49,7 @@ public class TransactionTest {
     }
 
     @Test
-    public void testRollback() throws SQLException {
+    public void testRollbackTransaction() throws SQLException {
         try(Connection connection = JDBCUtils.getConnection()) {
             Assert.assertTrue(connection.getAutoCommit());
 
@@ -65,13 +65,23 @@ public class TransactionTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testCustomizingActiveTransaction() throws SQLException {
-        try(Connection connection = JDBCUtils.getConnection()) {
-            Transaction transaction = new InternalTransaction(connection);
-            transaction.begin();
+    public void testChangeReadOnlyInActiveTransaction() {
+        Connection connection = Mockito.mock(Connection.class);
 
-            transaction.setReadOnly(true);
-        }
+        Transaction transaction = new InternalTransaction(connection);
+        transaction.begin();
+
+        transaction.setReadOnly(true);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testChangeIsolationLevelInActiveTransaction() {
+        Connection connection = Mockito.mock(Connection.class);
+
+        Transaction transaction = new InternalTransaction(connection);
+        transaction.begin();
+
+        transaction.setIsolationLevel(TransactionIsolationLevel.SERIALIZABLE);
     }
 
     @Test
