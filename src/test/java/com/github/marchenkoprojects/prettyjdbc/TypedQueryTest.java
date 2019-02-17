@@ -23,7 +23,7 @@ public class TypedQueryTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testTypedQueryExecutionWithoutResultMapper() {
+    public void testNativeTypedQueryExecutionWithoutResultMapper() {
         Connection connection = JDBCUtils.getConnection();
         try(Session session = SessionFactory.newSession(connection)) {
             session
@@ -33,8 +33,19 @@ public class TypedQueryTest {
         }
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void testTypedQueryExecutionWithoutResultMapper() {
+        Connection connection = JDBCUtils.getConnection();
+        try(Session session = SessionFactory.newSession(connection)) {
+            session
+                    .createQuery("SELECT * FROM films LIMIT ?", Film.class)
+                    .setParameter(1, 10)
+                    .list();
+        }
+    }
+
     @Test
-    public void testTypedQueryExecutionWithUniqueResult() {
+    public void testNativeTypedQueryExecutionWithUniqueResult() {
         Connection connection = JDBCUtils.getConnection();
         try(Session session = SessionFactory.newSession(connection)) {
             Film film = session
@@ -52,6 +63,27 @@ public class TypedQueryTest {
             Assert.assertEquals(film.getId(), 1);
             Assert.assertEquals(film.getOriginalName(), "The Lord of the Rings: The Fellowship of the Ring");
             Assert.assertEquals(film.getYear(), 2001);
+        }
+    }
+
+    @Test
+    public void testTypedQueryWithNamedParametersWithListOfResults() {
+        Connection connection = JDBCUtils.getConnection();
+        try(Session session = SessionFactory.newSession(connection)) {
+            List<Film> films = session
+                    .createQuery("SELECT id, original_name, year FROM films OFFSET :offset LIMIT :limit", Film.class)
+                    .setParameter("offset", 0)
+                    .setParameter("limit", 10)
+                    .setResultMapper(resultSet -> {
+                        Film newFilm = new Film();
+                        newFilm.setId(resultSet.getInt("id"));
+                        newFilm.setOriginalName(resultSet.getString("original_name"));
+                        newFilm.setYear(resultSet.getShort("year"));
+                        return newFilm;
+                    })
+                    .list();
+            Assert.assertNotNull(films);
+            Assert.assertEquals(films.size(), 3);
         }
     }
 

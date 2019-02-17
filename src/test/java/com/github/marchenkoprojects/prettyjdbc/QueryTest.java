@@ -33,13 +33,13 @@ public class QueryTest {
             try(PreparedStatement preparedStatement = connection.prepareStatement(
                     "SELECT id, original_name, year FROM films WHERE id = ?")) {
 
-                Query simpleQuery = new Query(preparedStatement);
-                Assert.assertTrue(simpleQuery.isActive());
+                Query query = new Query(preparedStatement);
+                Assert.assertTrue(query.isActive());
 
-                ReadOnlyScrollableResult scrollableResult = simpleQuery
+                ReadOnlyScrollableResult scrollableResult = query
                         .setParameter(1, 2)
                         .execute();
-                Assert.assertTrue(simpleQuery.isActive());
+                Assert.assertTrue(query.isActive());
 
                 Assert.assertNotNull(scrollableResult);
                 Assert.assertEquals(scrollableResult.getRowCount(), 1);
@@ -58,14 +58,15 @@ public class QueryTest {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT INTO films VALUES (?, ?, ?)")) {
 
-                Query simpleQuery = new Query(preparedStatement);
-                Assert.assertTrue(simpleQuery.isActive());
+                Query query = new Query(preparedStatement);
+                Assert.assertTrue(query.isActive());
 
-                simpleQuery
+                query
                         .setParameter(1, 4)
                         .setParameter(2, "The Hobbit: An Unexpected Journey")
                         .setParameter(3, 2012)
                         .executeUpdate();
+                Assert.assertTrue(query.isActive());
             }
 
             try(PreparedStatement preparedStatement = connection.prepareStatement(
@@ -87,8 +88,8 @@ public class QueryTest {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT INTO films VALUES (?, ?, ?)")) {
 
-                Query simpleQuery = new Query(preparedStatement);
-                simpleQuery
+                Query query = new Query(preparedStatement);
+                query
                         .setParameter(1, 5)
                         .setParameter(2, "The Hobbit: The Desolation of Smaug")
                         .setParameter(3, 2013)
