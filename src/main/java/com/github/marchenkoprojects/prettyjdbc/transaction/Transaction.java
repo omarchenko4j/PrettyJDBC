@@ -3,8 +3,8 @@ package com.github.marchenkoprojects.prettyjdbc.transaction;
 import com.github.marchenkoprojects.prettyjdbc.session.Session;
 
 /**
- * This abstraction defines a unit of work with a relational database. The lifecycle of a <code>Transaction</code> begins
- * with a method {@link Transaction#begin()} and ends with methods {@link Transaction#commit()} if successful
+ * This abstraction defines a unit of work with a relational database. The lifecycle of a <code>Transaction</code>
+ * begins with a method {@link Transaction#begin()} and ends with methods {@link Transaction#commit()} if successful
  * or {@link Transaction#rollback()} otherwise.
  * <br>
  * A transaction is associated with a {@link Session} and is usually initiated by a call to

@@ -16,8 +16,8 @@ import java.sql.Connection;
  * The main function of the session is to create queries in a relational database.
  * <br>
  * To create a query, use the method {@link Session#createQuery(String)} that accepts a SQL query.
- * The lifecycle of a <code>Session</code> is limited to its creation using the {@link com.github.marchenkoprojects.prettyjdbc.SessionFactory}
- * and the destruction using the method {@link Session#close()}.
+ * The lifecycle of a <code>Session</code> is limited to its creation using the
+ * {@link com.github.marchenkoprojects.prettyjdbc.SessionFactory} and the destruction using the method {@link Session#close()}.
  *
  * @author Oleg Marchenko
  *
@@ -86,6 +86,7 @@ public interface Session extends Unwrapable<Connection>, AutoCloseable {
      * @return not active and associated {@link Transaction} object
      * @throws RuntimeException if a database access error occurs
      *  or this method is called when the session connection is closed
+     * @see Transaction
      */
     Transaction newTransaction();
 
@@ -96,6 +97,7 @@ public interface Session extends Unwrapable<Connection>, AutoCloseable {
      * @return active and associated {@link Transaction} object
      * @throws RuntimeException if a database access error occurs
      *  or this method is called when the session connection is closed
+     * @see Transaction
      */
     Transaction beginTransaction();
 
@@ -104,6 +106,7 @@ public interface Session extends Unwrapable<Connection>, AutoCloseable {
      *
      * @return the current associated transaction or <code>null</code>,
      *  if the transaction has not been created
+     * @see Transaction
      */
     Transaction getTransaction();
 

@@ -13,7 +13,8 @@ import java.time.LocalTime;
 /**
  * The <code>Query</code> represents a single operation to the relational database.
  * It extends the capabilities of the standard abstraction {@link java.sql.PreparedStatement}.
- * The lifecycle of any implementation is very short and starts with the method {@link com.github.marchenkoprojects.prettyjdbc.session.Session#createQuery(String)}.
+ * The lifecycle of any implementation is very short and starts with the method
+ * {@link com.github.marchenkoprojects.prettyjdbc.session.Session#createQuery(String)}.
  * <br>
  * To perform a native SQL query, use the method {@link Query#execute()} which will return the result as {@link ReadOnlyScrollableResult};
  * to <code>INSERT</code>, <code>UPDATE</code> or <code>DELETE</code> the data, use the method {@link Query#executeUpdate()};
@@ -47,7 +48,6 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      * instead of waiting for the automatic closing to occur.
      *
      * @exception SQLException if a database access error occurs
-     * @see PreparedStatement#close()
      */
     @Override
     public void close() throws SQLException {
@@ -292,7 +292,6 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      * @return a <code>ReadOnlyScrollableResult</code> object that contains the data produced by the query
      * @throws RuntimeException if a database access error occurs
      * @see ReadOnlyScrollableResult
-     * @see PreparedStatement#executeQuery()
      */
     public ReadOnlyScrollableResult execute() {
         try (ResultSet result = preparedStatement.executeQuery()) {
@@ -311,7 +310,6 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      * @return either (1) the row count for SQL Data Manipulation Language (DML) statements
      *         or (2) 0 for SQL statements that return nothing
      * @throws RuntimeException if a database access error occurs
-     * @see PreparedStatement#executeUpdate()
      */
     public int executeUpdate() {
         try {
@@ -327,7 +325,6 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @return instance of the specific query
      * @throws RuntimeException if a database access error occurs
-     * @see PreparedStatement#addBatch()
      */
     public Query addBatch() {
         try {
@@ -343,10 +340,8 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      * Submits a batch of commands to the database for execution and
      * if all commands execute successfully, returns an array of update counts.
      *
-     * @return an array of update counts containing one element for each
-     *         command in the batch
+     * @return an array of update counts containing one element for each command in the batch
      * @throws RuntimeException if a database access error occurs
-     * @see PreparedStatement#executeBatch()
      */
     public int[] executeBatch() {
         try {
@@ -364,7 +359,6 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      *
      * @return <code>true</code> if this <code>Query</code> object is still active;
      *         <code>false</code> if it is inactive
-     * @see PreparedStatement#isClosed()
      */
     public boolean isActive() {
         try {
@@ -390,7 +384,6 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      * Allows to immediately close the query, protecting against possible exceptions.
      *
      * @param query the query to close
-     *
      * @see Query#close()
      */
     public static void closeQuerySoftly(Query query) {

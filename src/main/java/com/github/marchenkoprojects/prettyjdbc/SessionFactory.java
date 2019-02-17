@@ -8,9 +8,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * The main function of the session factory is creating new {@link Session} instances between relational database and Java application.
- * Usually an application has a single <code>SessionFactory</code> instance
- * but to support different {@link DataSource} it is necessary to create several factories.
+ * The main function of the session factory is creating new {@link Session} instances between
+ * relational database and Java application. Usually an application has a single <code>SessionFactory</code>
+ * instance but to support different {@link DataSource} it is necessary to create several factories.
  * The internal state of the <code>SessionFactory</code> is immutable so it is thread safe!
  * <br>
  * To create a session factory, use the method {@link SessionFactory#create(DataSourceSupplier)}
@@ -51,6 +51,7 @@ public final class SessionFactory implements Unwrapable<DataSource> {
      * because the session is {@link AutoCloseable}.
      *
      * @return successfully created session
+     * @see Session
      */
     public Session openSession() {
         return newSession(getNewConnection());
@@ -69,8 +70,13 @@ public final class SessionFactory implements Unwrapable<DataSource> {
      * Returns a session within the current thread.
      * If the current session has not yet been created or is no longer active
      * then a new session will be opened ({@link SessionFactory#openSession()}) and bound to the current thread.
+     * <br>
+     * <b>Note:</b> The current session will be bound with the thread that called this method.
+     * <br>
+     * <b>Warning:</b> When the thread has completed work, the current session should be closed!
      *
      * @return the current session
+     * @see Session
      */
     public Session getCurrentSession() {
         return openOrObtainSession();
@@ -91,6 +97,7 @@ public final class SessionFactory implements Unwrapable<DataSource> {
      *
      * @param connection connection to wrap in session
      * @return successfully created session
+     * @see Session
      */
     public static Session newSession(Connection connection) {
         return new InternalSession(connection);
@@ -99,6 +106,8 @@ public final class SessionFactory implements Unwrapable<DataSource> {
     /**
      * Binds a session to the current thread.
      * If the current thread already has an active session then it will be forcibly terminated.
+     * <br>
+     * <b>Warning:</b> If the session was bound to the current thread then after use it is necessary to {@link SessionFactory#unbindSession()}.
      *
      * @param session a new session
      */
