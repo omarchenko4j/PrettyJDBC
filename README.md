@@ -66,6 +66,7 @@ try(Session session = SessionFactory.newSession(connection)) {
 ```
 But this method is recommended for `informational purposes only`!
 
+#### Working with Transaction ####
 A typical transaction should use the following idiom:
 ```java
 try (Session session = sessionFactory.openSession()) {
@@ -90,4 +91,53 @@ R result = session.doInTransaction(currentSession -> {
     // Work in transaction with return of the result
     return ...;
 });
+```
+
+### Query execution ###
+*PrettyJDBC* provides several types of queries:
+- **Query** - supports basic operations and work with parameters by index;
+- **NamedParameterQuery** - supports basic operations and work with parameters by name;
+- **TypedQuery** - supports extraction of specific objects from the result set.
+
+Creating and executing a simple query:
+```java
+ReadOnlyScrollableResult scrollableResult = session
+    .createNativeQuery("SELECT id, original_name FROM films LIMIT ?")
+    .setParameter(1, 10)
+    .execute();
+while (scrollableResult.next()) {
+    int id = scrollableResult.getInt("id");
+    String originalName = scrollableResult.getString("original_name");
+    // Work with data
+}
+```
+but when there are many parameters then easier to specify them by name:
+```java
+ReadOnlyScrollableResult scrollableResult = session
+    .createQuery("SELECT * FROM films WHERE year >= :year LIMIT :limit")
+    .setParameter("year", 2000)
+    .setParameter("limit", 10)
+    .execute();
+// Work with scrollableResult
+```
+Often it is necessary to transform the data from the result set to a specific object:
+```java
+// Specific object model.
+public class Film {
+    private int id;
+    private String originalName;
+    
+    // default constructor and getters/setters
+}
+
+Film film = session
+    .createQuery("SELECT id, original_name FROM films WHERE id = :filmId", Film.class)
+    .setParameter("filmId", 100)
+    .setResultMapper(resultSet -> {
+        Film newFilm = new Film();
+        newFilm.setId(resultSet.getInt("id"));
+        newFilm.setOriginalName(resultSet.getString("original_name"));
+        return newFilm;
+    })
+    .unique();
 ```
