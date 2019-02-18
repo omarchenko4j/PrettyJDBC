@@ -46,6 +46,7 @@ public interface Session extends Unwrapable<Connection>, AutoCloseable {
      * <br>
      * <b>Note:</b> This SQL query can be reused and executed multiple times.
      *
+     * @param <T> the specific type of result object
      * @param sql an SQL expression without or with parameters like '?'
      * @param resultType type of result object
      * @return a new native query object
@@ -71,6 +72,7 @@ public interface Session extends Unwrapable<Connection>, AutoCloseable {
      * <br>
      * <b>Note:</b> This SQL query can be reused and executed multiple times.
      *
+     * @param <T> the specific type of result object
      * @param sql an SQL expression with named parameters
      * @param resultType type of result object
      * @return a new query object
