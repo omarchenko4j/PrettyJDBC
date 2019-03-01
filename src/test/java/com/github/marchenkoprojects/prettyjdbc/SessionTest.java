@@ -18,6 +18,7 @@ import org.junit.Test;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.function.Function;
 
 /**
  * @author Oleg Marchenko
@@ -80,39 +81,51 @@ public class SessionTest {
         }
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testCreateNewNativeQueryWhenSessionAlreadyContainsActiveQuery() {
-        Connection connection = JDBCUtils.getConnection();
-        try(Session session = new InternalSession(connection)) {
-            session.createNativeQuery("SELECT * FROM films ORDER BY year");
-            session.createNativeQuery("SELECT * FROM films");
-        }
+        createNewQueryWhenSessionAlreadyContainsActiveQuery(
+                session -> session.createNativeQuery("SELECT * FROM films ORDER BY year"),
+                session -> session.createNativeQuery("SELECT * FROM films")
+        );
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testCreateNewNativeTypedQueryWhenSessionAlreadyContainsActiveQuery() {
-        Connection connection = JDBCUtils.getConnection();
-        try(Session session = new InternalSession(connection)) {
-            session.createNativeQuery("SELECT * FROM films ORDER BY year", Film.class);
-            session.createNativeQuery("SELECT * FROM films", Film.class);
-        }
+        createNewQueryWhenSessionAlreadyContainsActiveQuery(
+                session -> session.createNativeQuery("SELECT * FROM films ORDER BY year", Film.class),
+                session -> session.createNativeQuery("SELECT * FROM films", Film.class)
+        );
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testCreateNewQueryWithNamedParametersWhenSessionAlreadyContainsActiveQuery() {
-        Connection connection = JDBCUtils.getConnection();
-        try(Session session = new InternalSession(connection)) {
-            session.createQuery("SELECT * FROM films ORDER BY year LIMIT :limit");
-            session.createQuery("SELECT * FROM films LIMIT :limit");
-        }
+        createNewQueryWhenSessionAlreadyContainsActiveQuery(
+                session -> session.createQuery("SELECT * FROM films ORDER BY year LIMIT :limit"),
+                session -> session.createQuery("SELECT * FROM films LIMIT :limit")
+        );
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testCreateNewTypedQueryWithNamedParametersWhenSessionAlreadyContainsActiveQuery() {
+        createNewQueryWhenSessionAlreadyContainsActiveQuery(
+                session -> session.createQuery("SELECT COUNT(*) FROM films WHERE year = :{year}", Long.class),
+                session -> session.createQuery("SELECT * FROM films WHERE original_name LIKE 'The Lord of the Rings%'", Film.class)
+        );
+    }
+
+    private void createNewQueryWhenSessionAlreadyContainsActiveQuery(Function<Session, Query> firstQueryCreator,
+                                                                     Function<Session, Query> secondQueryCreator) {
         Connection connection = JDBCUtils.getConnection();
         try(Session session = new InternalSession(connection)) {
-            session.createQuery("SELECT COUNT(*) FROM films WHERE year = :{year}", Long.class);
-            session.createQuery("SELECT * FROM films WHERE original_name LIKE 'The Lord of the Rings%'", Film.class);
+            Query firstQuery = firstQueryCreator.apply(session);
+            Assert.assertNotNull(firstQuery);
+            Assert.assertTrue(firstQuery.isActive());
+
+            Query secondQuery = secondQueryCreator.apply(session);
+            Assert.assertNotNull(secondQuery);
+            Assert.assertTrue(secondQuery.isActive());
+
+            Assert.assertFalse(firstQuery.isActive());
         }
     }
 

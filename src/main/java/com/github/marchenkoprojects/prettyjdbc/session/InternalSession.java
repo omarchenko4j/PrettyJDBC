@@ -13,10 +13,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static com.github.marchenkoprojects.prettyjdbc.query.Query.closeQuerySoftly;
-import static com.github.marchenkoprojects.prettyjdbc.query.Query.isActiveQuery;
+import static com.github.marchenkoprojects.prettyjdbc.query.Query.safeCloseQuery;
 import static com.github.marchenkoprojects.prettyjdbc.transaction.InternalTransaction.isActiveTransaction;
-import static com.github.marchenkoprojects.prettyjdbc.transaction.InternalTransaction.stopTransactionSoftly;
+import static com.github.marchenkoprojects.prettyjdbc.transaction.InternalTransaction.safeStopTransaction;
 
 /**
  * This is the main internal implementation of the {@link Session} interface.
@@ -57,10 +56,6 @@ public class InternalSession implements Session {
      */
     @Override
     public Query createNativeQuery(String sql) {
-        if (isActiveQuery(query)) {
-            throw new IllegalStateException("Current session already contains the active query");
-        }
-
         PreparedStatement preparedStatement = createStatement(sql);
         Query query = new Query(preparedStatement);
         bindQuery(query);
@@ -72,10 +67,6 @@ public class InternalSession implements Session {
      */
     @Override
     public <T> TypedQuery<T> createNativeQuery(String sql, Class<T> resultType) {
-        if (isActiveQuery(query)) {
-            throw new IllegalStateException("Current session already contains the active query");
-        }
-
         PreparedStatement preparedStatement = createStatement(sql);
         TypedQuery<T> query = new TypedQuery<>(preparedStatement, resultType);
         bindQuery(query);
@@ -87,10 +78,6 @@ public class InternalSession implements Session {
      */
     @Override
     public NamedParameterQuery createQuery(String sql) {
-        if (isActiveQuery(query)) {
-            throw new IllegalStateException("Current session already contains the active query");
-        }
-
         NamedParameterQueryProcessor queryProcessor = new NamedParameterQueryProcessor(sql);
         queryProcessor.process();
 
@@ -105,10 +92,6 @@ public class InternalSession implements Session {
      */
     @Override
     public <T> TypedQuery<T> createQuery(String sql, Class<T> resultType) {
-        if (isActiveQuery(query)) {
-            throw new IllegalStateException("Current session already contains the active query");
-        }
-
         NamedParameterQueryProcessor queryProcessor = new NamedParameterQueryProcessor(sql);
         queryProcessor.process();
 
@@ -119,6 +102,7 @@ public class InternalSession implements Session {
     }
 
     private PreparedStatement createStatement(String sql) {
+        releaseQuery();
         try {
             return connection.prepareStatement(sql);
         }
@@ -136,11 +120,8 @@ public class InternalSession implements Session {
      */
     @Override
     public Transaction newTransaction() {
-        if (isActiveTransaction(transaction)) stopTransaction();
-
-        Transaction transaction = createTransaction();
-        bindTransaction(transaction);
-        return transaction;
+        stopTransaction();
+        return createTransaction();
     }
 
     /**
@@ -152,12 +133,13 @@ public class InternalSession implements Session {
 
         Transaction transaction = createTransaction();
         transaction.begin();
-        bindTransaction(transaction);
         return transaction;
     }
 
     private Transaction createTransaction() {
-        return new InternalTransaction(connection);
+        Transaction transaction = new InternalTransaction(connection);
+        bindTransaction(transaction);
+        return transaction;
     }
 
     private void bindTransaction(Transaction transaction) {
@@ -228,12 +210,12 @@ public class InternalSession implements Session {
     }
 
     private void releaseQuery() {
-        closeQuerySoftly(query);
+        safeCloseQuery(query);
         query = null;
     }
 
     private void stopTransaction() {
-        stopTransactionSoftly(transaction);
+        safeStopTransaction(transaction);
         transaction = null;
     }
 

@@ -375,6 +375,7 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      * @param query query to check activity
      * @return <code>true</code> if the query is still active;
      *         <code>false</code> otherwise
+     * @see Query#isActive()
      */
     public static boolean isActiveQuery(Query query) {
         return query != null && query.isActive();
@@ -386,14 +387,13 @@ public class Query implements Unwrapable<PreparedStatement>, AutoCloseable, Inde
      * @param query the query to close
      * @see Query#close()
      */
-    public static void closeQuerySoftly(Query query) {
-        if (query != null && query.isActive()) {
+    public static void safeCloseQuery(Query query) {
+        if (isActiveQuery(query)) {
             try {
                 query.close();
             }
             catch (SQLException e) {
                 // Intentionally swallow the exception.
-                // TODO: Add the warning after adding logging library.
             }
         }
     }
