@@ -83,11 +83,24 @@ public class QueryTest {
     }
 
     @Test
+    public void testDelegationToPreparedStatementWhenExecutingBatchedQuery() throws SQLException {
+        PreparedStatement statement = Mockito.mock(PreparedStatement.class);
+
+        Query query = new Query(statement);
+        query.addBatch();
+        query.addBatch();
+        query.addBatch();
+        Mockito.verify(statement, Mockito.times(3)).addBatch();
+
+        query.executeBatch();
+        Mockito.verify(statement).executeBatch();
+    }
+
+    @Test
     public void testBatchQueryExecution() throws SQLException {
         try(Connection connection = JDBCUtils.getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT INTO films VALUES (?, ?, ?)")) {
-
                 Query query = new Query(preparedStatement);
                 query
                         .setParameter(1, 5)

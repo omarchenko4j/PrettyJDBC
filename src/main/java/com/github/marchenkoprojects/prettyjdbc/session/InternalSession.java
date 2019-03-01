@@ -227,4 +227,33 @@ public class InternalSession implements Session {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * Returns <code>true</code> if the session is still open.
+     *
+     * @param session session to check activity
+     * @return <code>true</code> if the session is still open;
+     *         <code>false</code> otherwise
+     * @see Session#isOpen()
+     */
+    public static boolean isSessionOpen(Session session) {
+        return session != null && session.isOpen();
+    }
+
+    /**
+     * Allows to immediately close the session, protecting against possible exceptions.
+     *
+     * @param session session to close
+     * @see Session#close()
+     */
+    public static void safeCloseSession(Session session) {
+        if (isSessionOpen(session)) {
+            try {
+                session.close();
+            }
+            catch (Exception e) {
+                // Intentionally swallow the exception.
+            }
+        }
+    }
 }

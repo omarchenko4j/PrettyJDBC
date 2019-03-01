@@ -7,6 +7,8 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import static com.github.marchenkoprojects.prettyjdbc.session.InternalSession.safeCloseSession;
+
 /**
  * The main function of the session factory is creating new {@link Session} instances between
  * relational database and Java application. Usually an application has a single <code>SessionFactory</code>
@@ -54,10 +56,10 @@ public final class SessionFactory implements Unwrapable<DataSource> {
      * @see Session
      */
     public Session openSession() {
-        return newSession(getNewConnection());
+        return newSession(getConnection());
     }
 
-    private Connection getNewConnection() {
+    private Connection getConnection() {
         try {
             return dataSource.getConnection();
         }
@@ -136,9 +138,7 @@ public final class SessionFactory implements Unwrapable<DataSource> {
 
     private static void forcedTerminateCurrentSession() {
         Session currentSession = CURRENT_SESSION.get();
-        if (currentSession != null && currentSession.isOpen()) {
-            currentSession.close();
-        }
+        safeCloseSession(currentSession);
     }
 
     /**
