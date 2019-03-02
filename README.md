@@ -3,8 +3,8 @@
 [![](https://img.shields.io/codecov/c/github/marchenkoprojects/prettyjdbc/master.svg?colorB=yellow&style=flat)](https://codecov.io/gh/MarchenkoProjects/PrettyJDBC)
 [![](https://img.shields.io/librariesio/github/marchenkoprojects/prettyjdbc.svg?style=flat)](https://libraries.io/github/MarchenkoProjects/PrettyJDBC)
 [![](https://img.shields.io/github/license/marchenkoprojects/prettyjdbc.svg?style=flat)](https://github.com/MarchenkoProjects/PrettyJDBC/blob/master/LICENSE)
-[![](https://img.shields.io/maven-central/v/com.github.marchenkoprojects/prettyjdbc.svg?style=flat&colorB=brightgreen)](https://search.maven.org/artifact/com.github.marchenkoprojects/prettyjdbc/0.4/jar)
-[![](https://img.shields.io/badge/javadoc-v0.4-blue.svg?style=flat)](https://javadoc.io/doc/com.github.marchenkoprojects/prettyjdbc/0.4)
+[![](https://img.shields.io/maven-central/v/com.github.marchenkoprojects/prettyjdbc.svg?style=flat&colorB=brightgreen)](https://search.maven.org/artifact/com.github.marchenkoprojects/prettyjdbc/0.4.1/jar)
+[![](https://img.shields.io/badge/javadoc-v0.4.1-blue.svg?style=flat)](https://javadoc.io/doc/com.github.marchenkoprojects/prettyjdbc/0.4.1)
 
 **PrettyJDBC** is a Java library that provides a simple and transparent way to work with a relational database.
 The library introduces a lightweight level of abstraction over *JDBC technology*.
@@ -22,12 +22,12 @@ If you are using automated build systems just add the following dependency to yo
 <dependency>
   <groupId>com.github.marchenkoprojects</groupId>
   <artifactId>prettyjdbc</artifactId>
-  <version>0.4</version>
+  <version>0.4.1</version>
 </dependency>
 ```
 **Gradle:**
 ```groovy
-compile("com.github.marchenkoprojects:prettyjdbc:0.4")
+compile("com.github.marchenkoprojects:prettyjdbc:0.4.1")
 ```
 
 ### Creating a SessionFactory ###
