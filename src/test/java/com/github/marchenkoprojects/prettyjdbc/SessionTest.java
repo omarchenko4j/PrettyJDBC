@@ -289,7 +289,7 @@ public class SessionTest {
     }
 
     @Test
-    public void testDoInTransaction() {
+    public void testDoInTransactionSuccessfully() {
         Connection connection = JDBCUtils.getConnection();
         Assert.assertTrue(JDBCUtils.getAutoCommit(connection));
 
@@ -297,8 +297,8 @@ public class SessionTest {
             Assert.assertTrue(JDBCUtils.getAutoCommit(connection));
             Assert.assertNull(session.getTransaction());
 
-            session.doInTransaction((s) -> {
-                Transaction transaction = s.getTransaction();
+            session.doInTransaction(currentSession -> {
+                Transaction transaction = currentSession.getTransaction();
                 Assert.assertNotNull(transaction);
                 Assert.assertEquals(transaction.getStatus(), TransactionStatus.ACTIVE);
 
@@ -313,8 +313,18 @@ public class SessionTest {
         }
     }
 
+    @Test(expected = RuntimeException.class)
+    public void testDoInTransactionThrowExceptionAfterExceptionInside() {
+        Connection connection = JDBCUtils.getConnection();
+        try(Session session = new InternalSession(connection)) {
+            session.doInTransaction(currentSession -> {
+                JDBCUtils.throwException();
+            });
+        }
+    }
+
     @Test
-    public void testDoInTransactionWithResult() {
+    public void testDoInTransactionWithResultSuccessfully() {
         Connection connection = JDBCUtils.getConnection();
         Assert.assertTrue(JDBCUtils.getAutoCommit(connection));
 
@@ -322,15 +332,29 @@ public class SessionTest {
             Assert.assertTrue(JDBCUtils.getAutoCommit(connection));
             Assert.assertNull(session.getTransaction());
 
-            Boolean result = session.doInTransaction((s) -> {
-                Transaction transaction = s.getTransaction();
+            Boolean result = session.doInTransaction(currentSession -> {
+                Transaction transaction = currentSession.getTransaction();
                 Assert.assertNotNull(transaction);
                 Assert.assertEquals(transaction.getStatus(), TransactionStatus.ACTIVE);
 
                 Assert.assertFalse(JDBCUtils.getAutoCommit(connection));
 
-                JDBCUtils.throwException();
+                return Boolean.TRUE;
+            });
+            Assert.assertTrue(result);
 
+            Transaction transaction = session.getTransaction();
+            Assert.assertNotNull(transaction);
+            Assert.assertEquals(transaction.getStatus(), TransactionStatus.COMPLETED);
+        }
+    }
+
+    @Test
+    public void testDoInTransactionWithResultReturnNullAfterExceptionInside() {
+        Connection connection = JDBCUtils.getConnection();
+        try(Session session = new InternalSession(connection)) {
+            Boolean result = session.doInTransaction(currentSession -> {
+                JDBCUtils.throwException();
                 return Boolean.TRUE;
             });
             Assert.assertNull(result);

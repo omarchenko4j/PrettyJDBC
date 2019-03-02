@@ -166,6 +166,7 @@ public class InternalSession implements Session {
         }
         catch (Exception e) {
             transaction.rollback();
+            throw new RuntimeException(e);
         }
     }
 
