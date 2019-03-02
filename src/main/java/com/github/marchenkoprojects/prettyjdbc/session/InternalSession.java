@@ -102,7 +102,6 @@ public class InternalSession implements Session {
     }
 
     private PreparedStatement createStatement(String sql) {
-        releaseQuery();
         try {
             return connection.prepareStatement(sql);
         }
@@ -112,6 +111,7 @@ public class InternalSession implements Session {
     }
 
     private void bindQuery(Query query) {
+        releaseQuery();
         this.query = query;
     }
 
