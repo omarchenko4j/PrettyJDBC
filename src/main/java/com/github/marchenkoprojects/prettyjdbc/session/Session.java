@@ -56,7 +56,7 @@ public interface Session extends Unwrapable<Connection>, AutoCloseable {
 
     /**
      * Creates a new query object with named parameters to send SQL expressions to the database.
-     * Named parameters are defined as patterns: <b>:paramName</b> or <b>:{paramName}</b> where <tt>paramName</tt> is name of parameter.
+     * Named parameters are defined as patterns: <b>:paramName</b> or <b>:{paramName}</b> where <b>paramName</b> is name of parameter.
      * <br>
      * <b>Note:</b> This SQL query can be reused and executed multiple times.
      *
@@ -68,7 +68,7 @@ public interface Session extends Unwrapable<Connection>, AutoCloseable {
 
     /**
      * Creates a new query object with named parameters to send SQL expressions to the database with typed result retrieval.
-     * Named parameters are defined as patterns: <b>:paramName</b> or <b>:{paramName}</b> where <tt>paramName</tt> is name of parameter.
+     * Named parameters are defined as patterns: <b>:paramName</b> or <b>:{paramName}</b> where <b>paramName</b> is name of parameter.
      * <br>
      * <b>Note:</b> This SQL query can be reused and executed multiple times.
      *
@@ -113,7 +113,7 @@ public interface Session extends Unwrapable<Connection>, AutoCloseable {
     Transaction getTransaction();
 
     /**
-     * This method allows to <tt>atomically</tt> perform database operations without returning the result.
+     * This method allows to <i>atomically</i> perform database operations without returning the result.
      *
      * @param work database operations provider
      * @throws RuntimeException if a database access error occurs
@@ -122,7 +122,7 @@ public interface Session extends Unwrapable<Connection>, AutoCloseable {
     void doInTransaction(TransactionWork work);
 
     /**
-     * This method allows to <tt>atomically</tt> perform database operations with returning the result.
+     * This method allows to <i>atomically</i> perform database operations with returning the result.
      *
      * @param <R> type of returning result
      * @param work database operations with result provider

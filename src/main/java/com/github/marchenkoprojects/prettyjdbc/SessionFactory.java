@@ -79,7 +79,7 @@ public final class SessionFactory implements Unwrapable<DataSource> {
      * <br>
      * <b>Warning:</b> When the thread has completed work, the current session should be closed!
      * <br>
-     * @deprecated use {@link this#getSession()}.
+     * @deprecated use {@link #getSession()}.
      * <br>
      * @return the current session
      * @see Session
