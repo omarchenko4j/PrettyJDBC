@@ -18,30 +18,30 @@ import java.util.Map;
  * @see ReadOnlyScrollableResult
  */
 public class CachedScrollableResult implements ReadOnlyScrollableResult {
-    private static int DEFAULT_ROWS_CAPACITY = 64;
-    private static int BEFORE_FIRST_ROW_INDEX = -1;
+    private static final int DEFAULT_ROWS_CAPACITY = 64;
+    private static final int BEFORE_FIRST_ROW_INDEX = -1;
 
-    private final List<List<Object>> cachedResultByIndex;
+    private final List<List<Object>> cachedResults;
     private final Map<String, Integer> columnNameToIndexRegistry;
     private int cursorIndex = BEFORE_FIRST_ROW_INDEX;
     private int rowCount;
 
-    public CachedScrollableResult(ResultSet result) throws SQLException {
-        ResultSetMetaData metaData = result.getMetaData();
+    public CachedScrollableResult(ResultSet resultSet) throws SQLException {
+        ResultSetMetaData metaData = resultSet.getMetaData();
         int columnCount = metaData.getColumnCount();
 
-        cachedResultByIndex = new ArrayList<>(columnCount);
+        cachedResults = new ArrayList<>(columnCount);
         columnNameToIndexRegistry = new HashMap<>(columnCount + 1, 1);
         for (int i = 1; i <= columnCount; i++) {
-            cachedResultByIndex.add(new ArrayList<>(DEFAULT_ROWS_CAPACITY));
+            cachedResults.add(new ArrayList<>(DEFAULT_ROWS_CAPACITY));
 
             String columnName = metaData.getColumnName(i).toLowerCase();
             columnNameToIndexRegistry.put(columnName, i - 1);
         }
 
-        while (result.next()) {
+        while (resultSet.next()) {
             for (int i = 1; i <= columnCount; i++) {
-                cachedResultByIndex.get(i - 1).add(result.getObject(i));
+                cachedResults.get(i - 1).add(resultSet.getObject(i));
             }
             rowCount++;
         }
@@ -303,7 +303,7 @@ public class CachedScrollableResult implements ReadOnlyScrollableResult {
      */
     @Override
     public Object getObject(int columnIndex) {
-        return cachedResultByIndex.get(columnIndex - 1).get(cursorIndex);
+        return cachedResults.get(columnIndex - 1).get(cursorIndex);
     }
 
     /**
