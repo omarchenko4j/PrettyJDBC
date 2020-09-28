@@ -11,6 +11,7 @@ import java.sql.Timestamp;
  *
  * @author Oleg Marchenko
  */
+@Deprecated
 public class TimestampResultMapper implements ResultMapper<Timestamp> {
 
     /**

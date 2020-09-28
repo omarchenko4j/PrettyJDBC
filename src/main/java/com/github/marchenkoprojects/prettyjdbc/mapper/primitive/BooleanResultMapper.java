@@ -10,6 +10,7 @@ import java.sql.SQLException;
  *
  * @author Oleg Marchenko
  */
+@Deprecated
 public class BooleanResultMapper implements ResultMapper<Boolean> {
 
     /**

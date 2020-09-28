@@ -11,6 +11,7 @@ import java.sql.Time;
  *
  * @author Oleg Marchenko
  */
+@Deprecated
 public class TimeResultMapper implements ResultMapper<Time> {
 
     /**

@@ -12,6 +12,7 @@ import java.time.LocalDate;
  *
  * @author Oleg Marchenko
  */
+@Deprecated
 public class LocalDateResultMapper implements ResultMapper<LocalDate> {
 
     /**

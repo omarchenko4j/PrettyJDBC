@@ -11,6 +11,7 @@ import java.sql.SQLException;
  *
  * @author Oleg Marchenko
  */
+@Deprecated
 public class BigDecimalResultMapper implements ResultMapper<BigDecimal> {
 
     /**
