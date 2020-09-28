@@ -12,8 +12,9 @@ import com.github.marchenkoprojects.prettyjdbc.util.NamedParameterQueryProcessor
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 
-import static com.github.marchenkoprojects.prettyjdbc.query.Query.safeCloseQuery;
 import static com.github.marchenkoprojects.prettyjdbc.transaction.InternalTransaction.isActiveTransaction;
 import static com.github.marchenkoprojects.prettyjdbc.transaction.InternalTransaction.safeStopTransaction;
 
@@ -33,12 +34,13 @@ public class InternalSession implements Session {
      */
     private Transaction transaction;
     /**
-     * Associated query with this session.
+     * Collection of associated queries with this session.
      */
-    private Query query;
+    private Collection<Query> queries;
 
     public InternalSession(Connection connection) {
         this.connection = connection;
+        this.queries = new ArrayList<>(4);
     }
 
     /**
@@ -111,8 +113,7 @@ public class InternalSession implements Session {
     }
 
     private void bindQuery(Query query) {
-        releaseQuery();
-        this.query = query;
+        this.queries.add(query);
     }
 
     /**
@@ -211,8 +212,8 @@ public class InternalSession implements Session {
     }
 
     private void releaseQuery() {
-        safeCloseQuery(query);
-        query = null;
+        queries.forEach(Query::safeCloseQuery);
+        queries = null;
     }
 
     private void stopTransaction() {

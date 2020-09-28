@@ -36,8 +36,8 @@ public class SessionFactoryCurrentSessionTest {
 
         SessionFactory sessionFactory = SessionFactory.create(() -> dataSource);
 
-        Future<Session> firstThreadResult = EXECUTOR.submit(sessionFactory::getCurrentSession);
-        Future<Session> secondThreadResult = EXECUTOR.submit(sessionFactory::getCurrentSession);
+        Future<Session> firstThreadResult = EXECUTOR.submit(sessionFactory::getSession);
+        Future<Session> secondThreadResult = EXECUTOR.submit(sessionFactory::getSession);
 
         Session firstThreadSession = firstThreadResult.get();
         Session secondThreadSession = secondThreadResult.get();

@@ -82,50 +82,16 @@ public class SessionTest {
     }
 
     @Test
-    public void testCreateNewNativeQueryWhenSessionAlreadyContainsActiveQuery() {
-        createNewQueryWhenSessionAlreadyContainsActiveQuery(
-                session -> session.createNativeQuery("SELECT * FROM films ORDER BY year"),
-                session -> session.createNativeQuery("SELECT * FROM films")
-        );
-    }
-
-    @Test
-    public void testCreateNewNativeTypedQueryWhenSessionAlreadyContainsActiveQuery() {
-        createNewQueryWhenSessionAlreadyContainsActiveQuery(
-                session -> session.createNativeQuery("SELECT * FROM films ORDER BY year", Film.class),
-                session -> session.createNativeQuery("SELECT * FROM films", Film.class)
-        );
-    }
-
-    @Test
-    public void testCreateNewQueryWithNamedParametersWhenSessionAlreadyContainsActiveQuery() {
-        createNewQueryWhenSessionAlreadyContainsActiveQuery(
-                session -> session.createQuery("SELECT * FROM films ORDER BY year LIMIT :limit"),
-                session -> session.createQuery("SELECT * FROM films LIMIT :limit")
-        );
-    }
-
-    @Test
-    public void testCreateNewTypedQueryWithNamedParametersWhenSessionAlreadyContainsActiveQuery() {
-        createNewQueryWhenSessionAlreadyContainsActiveQuery(
-                session -> session.createQuery("SELECT COUNT(*) FROM films WHERE year = :{year}", Long.class),
-                session -> session.createQuery("SELECT * FROM films WHERE original_name LIKE 'The Lord of the Rings%'", Film.class)
-        );
-    }
-
-    private void createNewQueryWhenSessionAlreadyContainsActiveQuery(Function<Session, Query> firstQueryCreator,
-                                                                     Function<Session, Query> secondQueryCreator) {
+    public void testCreateMultipleQueriesWithinSingleSession() {
         Connection connection = JDBCUtils.getConnection();
         try(Session session = new InternalSession(connection)) {
-            Query firstQuery = firstQueryCreator.apply(session);
-            Assert.assertNotNull(firstQuery);
+            Query firstQuery = session.createNativeQuery("SELECT * FROM films");
+            NamedParameterQuery secondQuery = session.createQuery("SELECT * FROM films LIMIT :limit");
+            TypedQuery<Film> thirdQuery = session.createQuery("SELECT * FROM films ORDER BY year", Film.class);
+
             Assert.assertTrue(firstQuery.isActive());
-
-            Query secondQuery = secondQueryCreator.apply(session);
-            Assert.assertNotNull(secondQuery);
             Assert.assertTrue(secondQuery.isActive());
-
-            Assert.assertFalse(firstQuery.isActive());
+            Assert.assertTrue(thirdQuery.isActive());
         }
     }
 
