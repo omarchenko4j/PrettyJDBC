@@ -14,6 +14,16 @@ import java.sql.SQLException;
  */
 public class SessionFactoryTest {
 
+    @Test(expected = NullPointerException.class)
+    public void testCreateSessionFactoryWithNullDataSourceSupplier() {
+        SessionFactory.create(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testCreateSessionFactoryWithNullDataSource() {
+        SessionFactory.create(() -> null);
+    }
+
     @Test
     public void testCreateSessionFactory() {
         DataSource dataSource = Mockito.mock(DataSource.class);
@@ -21,11 +31,6 @@ public class SessionFactoryTest {
         SessionFactory sessionFactory = SessionFactory.create(() -> dataSource);
         Assert.assertNotNull(sessionFactory);
         Assert.assertEquals(dataSource, sessionFactory.unwrap());
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testCreateSessionFactoryWithNullDataSource() {
-        SessionFactory.create(() -> null);
     }
 
     @Test
@@ -63,7 +68,7 @@ public class SessionFactoryTest {
         SessionFactory.bindSession(session);
 
         SessionFactory sessionFactory = SessionFactory.create(() -> Mockito.mock(DataSource.class));
-        Session currentSession = sessionFactory.getCurrentSession();
+        Session currentSession = sessionFactory.getSession();
         Assert.assertNotNull(currentSession);
         Assert.assertEquals(session, currentSession);
     }

@@ -27,6 +27,8 @@ import static com.github.marchenkoprojects.prettyjdbc.session.InternalSession.sa
 public final class SessionFactory implements Unwrapable<DataSource> {
     /**
      * Active session within the current thread.
+     * <br>
+     * <b>Warning:</b> The lifecycle of this session is manually managed.
      */
     private static final ThreadLocal<Session> CURRENT_SESSION = new ThreadLocal<>();
 
@@ -76,11 +78,30 @@ public final class SessionFactory implements Unwrapable<DataSource> {
      * <b>Note:</b> The current session will be bound with the thread that called this method.
      * <br>
      * <b>Warning:</b> When the thread has completed work, the current session should be closed!
-     *
+     * <br>
+     * @deprecated use {@link this#getSession()}.
+     * <br>
      * @return the current session
      * @see Session
      */
+    @Deprecated
     public Session getCurrentSession() {
+        return openOrObtainSession();
+    }
+
+    /**
+     * Returns a session within the current thread.
+     * If the current session has not yet been created or is no longer active
+     * then a new session will be opened ({@link SessionFactory#openSession()}) and bound to the current thread.
+     * <br>
+     * <b>Note:</b> The current session will be bound with the current thread that called this method.
+     * <br>
+     * <b>Warning:</b> When the thread has completed work, the current session should be closed manually!
+     *
+     * @return the current session within the thread
+     * @see Session
+     */
+    public Session getSession() {
         return openOrObtainSession();
     }
 
@@ -148,6 +169,10 @@ public final class SessionFactory implements Unwrapable<DataSource> {
      * @return a new session factory
      */
     public static SessionFactory create(DataSourceSupplier supplier) {
+        if (supplier == null) {
+            throw new NullPointerException("Data source supplier is null");
+        }
+
         DataSource dataSource = supplier.get();
         if (dataSource == null) {
             throw new NullPointerException("Data source is null");
