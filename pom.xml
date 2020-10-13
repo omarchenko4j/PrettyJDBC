@@ -75,7 +75,7 @@
         <maven.plugin.jacoco.version>0.8.3</maven.plugin.jacoco.version>
 
         <mockito.version>2.23.4</mockito.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <hsqldb.version>2.4.1</hsqldb.version>
     </properties>
 
